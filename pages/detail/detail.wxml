@@ -1,0 +1,63 @@
+<view class="container">
+  <view class="header-card">
+    <view class="name">{{asset.name}} <text class="code">({{asset.code}})</text></view>
+    <view class="balance-row">
+      <view class="label">持有金额</view>
+      <view class="amount">¥ {{asset.balance}}</view>
+    </view>
+    <view class="profit-row">
+      <view class="item">
+        <text class="p-label">持有份额</text>
+        <text class="p-value">{{asset.shares}}</text>
+      </view>
+      <view class="item">
+        <text class="p-label">最新净值</text>
+        <text class="p-value">{{asset.nav}}</text>
+      </view>
+      <view class="item">
+        <text class="p-label">日涨跌幅</text>
+        <text class="p-value {{asset.rate >= 0 ? 'red' : 'green'}}">{{asset.rate}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card chart-card">
+    <view class="card-title">近一月净值走势</view>
+    
+    <image 
+      wx:if="{{asset.code}}"
+      class="fund-chart" 
+      src="https://image.sinajs.cn/newchart/v5/fund/nav/ss/{{asset.code}}.gif" 
+      mode="aspectFit"
+      binderror="onImageError"
+    ></image>
+    
+    <view wx:else class="no-chart-tip">非基金资产无走势图</view>
+    
+    <view class="chart-tip">数据来源：新浪财经</view>
+  </view>
+
+  <view class="card info-card">
+    <view class="card-title">收益详情</view>
+    <view class="row">
+      <text>投入本金</text>
+      <text>¥ {{asset.principal}}</text>
+    </view>
+    <view class="row">
+      <text>累计盈亏</text>
+      <text class="{{(asset.balance - asset.principal) >= 0 ? 'red' : 'green'}}">
+        {{(asset.balance - asset.principal) >= 0 ? '+' : ''}}{{fixedProfit}}
+      </text>
+    </view>
+    <view class="row">
+      <text>当日预估收益</text>
+      <text class="{{asset.dayIncome >= 0 ? 'red' : 'green'}}">
+        {{asset.dayIncome >= 0 ? '+' : ''}}{{asset.dayIncome}}
+      </text>
+    </view>
+    <view class="row">
+      <text>累计收益率</text>
+      <text>{{totalRate}}%</text>
+    </view>
+  </view>
+</view>

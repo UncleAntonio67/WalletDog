@@ -1,0 +1,53 @@
+<view class="container">
+  <view class="card form-card">
+    <view class="form-title">录入新资产</view>
+
+    <view class="form-item">
+      <text class="label">资产名称</text>
+      <input class="input" placeholder="如：易方达蓝筹" bindinput="onNameInput" value="{{name}}" />
+    </view>
+
+    <view class="form-item">
+      <text class="label">资产分类</text>
+      <picker bindchange="onTypeChange" value="{{typeIndex}}" range="{{types}}">
+        <view class="picker">{{types[typeIndex]}} <text class="arrow">></text></view>
+      </picker>
+    </view>
+
+    <block wx:if="{{types[typeIndex] === '公募基金'}}">
+      <view class="form-item">
+        <text class="label">基金代码</text>
+        <input class="input" type="number" placeholder="6位数字(如110011)" bindinput="onCodeInput" value="{{code}}" maxlength="6" />
+      </view>
+    </block>
+
+    <view class="form-item">
+      <text class="label">投入本金</text>
+      <input class="input" type="digit" placeholder="0.00" bindinput="onPrincipalInput" value="{{principal}}" />
+    </view>
+
+    <block wx:if="{{types[typeIndex] !== '银行存款'}}">
+      <view class="form-item">
+        <text class="label">持有份额</text>
+        <input class="input" type="digit" placeholder="0.00" bindinput="onShareInput" value="{{shares}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">当前净值</text>
+        <input class="input" type="digit" placeholder="1.0000" bindinput="onNavInput" value="{{nav}}" />
+      </view>
+    </block>
+    <block wx:else>
+      <view class="form-item">
+        <text class="label">当前余额</text>
+        <input class="input" type="digit" placeholder="含利息总额" bindinput="onBalanceInput" value="{{balance}}" />
+      </view>
+    </block>
+
+    <view class="form-item">
+      <text class="label">预期年化(%)</text>
+      <input class="input" type="digit" placeholder="选填" bindinput="onRateInput" value="{{annualRate}}" />
+    </view>
+  </view>
+
+  <button class="save-btn" bindtap="saveAsset">保存资产</button>
+</view>

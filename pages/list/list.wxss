@@ -1,0 +1,64 @@
+/* 顶部统计 */
+.header-bar {
+  padding: 20rpx 30rpx;
+  display: flex;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: #999;
+  background: #f5f7fa;
+}
+
+/* 列表容器 */
+.list-container {
+  padding: 0 20rpx 40rpx;
+}
+
+/* 资产卡片 */
+.asset-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.02);
+}
+/* 按下效果 */
+.asset-card:active {
+  background-color: #f9f9f9;
+}
+
+/* 左侧信息 */
+.card-left { display: flex; flex-direction: column; }
+
+.row-1 { display: flex; align-items: center; margin-bottom: 10rpx; }
+.asset-name { font-size: 30rpx; font-weight: bold; color: #333; margin-right: 16rpx; }
+
+/* 标签样式 */
+.tag { font-size: 20rpx; padding: 4rpx 12rpx; border-radius: 8rpx; }
+.tag.blue { background: #E3F2FD; color: #1976D2; }
+.tag.red { background: #FFEBEE; color: #D32F2F; }
+.tag.orange { background: #FFF3E0; color: #F57C00; }
+
+.row-2 { font-size: 24rpx; color: #999; }
+
+/* 右侧金额 */
+.card-right { text-align: right; }
+.amount { font-size: 32rpx; font-weight: bold; color: #333; }
+.profit { font-size: 24rpx; margin-top: 4rpx; }
+
+/* 盈亏颜色 */
+.text-up { color: #E74C3C; }
+.text-down { color: #2ECC71; }
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 200rpx;
+  color: #ccc;
+  font-size: 28rpx;
+}
+.empty-icon { width: 100rpx; height: 100rpx; opacity: 0.3; margin-bottom: 20rpx; }

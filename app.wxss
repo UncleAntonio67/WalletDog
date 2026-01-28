@@ -1,0 +1,61 @@
+/* 全局变量定义 */
+page {
+  /* 核心色板 */
+  --primary: #1A73E8;   /* 财富蓝 - 主色调 */
+  --up: #E74C3C;        /* 盈利红 */
+  --down: #2ECC71;      /* 亏损绿 */
+  --bg: #F5F7FA;        /* 全局浅灰背景 */
+  --text-main: #333333; /* 主标题色 */
+  --text-sub: #999999;  /* 辅助文字色 */
+  
+  /* 设置页面背景 */
+  background-color: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
+    sans-serif;
+  font-size: 28rpx;
+  color: var(--text-main);
+  box-sizing: border-box;
+}
+
+/* --- 通用工具类 --- */
+
+/* 1. 通用白色卡片 */
+.card {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05); /* 轻微的投影，增加高级感 */
+}
+
+/* 2. Flex 布局助手 */
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+/* 3. 颜色助手 */
+.text-primary { color: var(--primary); }
+.text-up { color: var(--up); }
+.text-down { color: var(--down); }
+.text-sub { color: var(--text-sub); }
+
+/* 4. 字体助手 */
+.font-bold { font-weight: bold; }
+.font-lg { font-size: 32rpx; }
+.font-xl { font-size: 40rpx; }

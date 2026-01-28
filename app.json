@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/list/list",
+    "pages/add/add",
+    "pages/detail/detail"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1A73E8",
+    "navigationBarTitleText": "我的财富",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1A73E8",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "总览",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/list/list",
+        "text": "明细",
+        "iconPath": "images/list.png",
+        "selectedIconPath": "images/list-active.png"
+      },
+      {
+        "pagePath": "pages/add/add",
+        "text": "记一笔",
+        "iconPath": "images/add.png",
+        "selectedIconPath": "images/add-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

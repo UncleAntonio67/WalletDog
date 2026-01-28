@@ -1,0 +1,52 @@
+<view class="container">
+  <view class="header-card">
+    <view class="card-content">
+      <text class="label">总资产 (元)</text>
+      <view class="total-amount">¥ {{totalBalance}}</view>
+      <view class="profit-row">
+        <text>累计盈亏：</text>
+        <text class="{{totalProfit >= 0 ? 'text-up' : 'text-down'}}">{{totalProfit >= 0 ? '+' : ''}}{{totalProfit}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card chart-card">
+    <view class="card-title">资产分布</view>
+    <view class="chart-container">
+      <view class="pie-chart"></view>
+      <view class="legend">
+        <view class="legend-item"><view class="dot color-1"></view> 银行存款 30%</view>
+        <view class="legend-item"><view class="dot color-2"></view> 公募基金 45%</view>
+        <view class="legend-item"><view class="dot color-3"></view> 定期理财 20%</view>
+        <view class="legend-item"><view class="dot color-4"></view> 其他 5%</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card ranking-card">
+    <view class="card-title">收益榜单 (按余额排序)</view>
+    <view class="ranking-list">
+      <block wx:for="{{rankingList}}" wx:key="id">
+        <view class="ranking-item" bindtap="goToDetail" data-item="{{item}}">
+          <view class="rank-num {{index < 3 ? 'top-three' : ''}}">{{index + 1}}</view>
+          <view class="product-info">
+            <view class="name">{{item.name}}</view>
+            <view class="rate {{item.rate >= 0 ? 'text-up' : 'text-down'}}">
+              {{item.rate}}% (日涨跌)
+            </view>
+          </view>
+          <view class="income-box">
+             <view class="income-val {{item.dayIncome >= 0 ? 'text-up' : 'text-down'}}">
+               {{item.dayIncome >= 0 ? '+' : ''}}{{item.dayIncome}}
+             </view>
+             <view class="total-bal">¥{{item.balance}}</view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <view class="fab" bindtap="goToAdd">
+    <image class="plus-icon" src="/images/add-active.png"></image>
+  </view>
+</view>

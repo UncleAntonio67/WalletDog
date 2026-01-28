@@ -1,0 +1,29 @@
+# --- Dependencies (依赖包) ---
+node_modules/
+**/node_modules/
+
+# --- Build Artifacts (构建产物) ---
+# 微信开发者工具构建 npm 后生成的目录，建议忽略，让每位开发者本地构建
+miniprogram_npm/
+
+# --- User & Local Config (个人配置 - 绝对不要提交) ---
+# 包含你的个人 AppID 关联、本地编译设置等隐私信息
+project.private.config.json
+project.local.config.json
+
+# --- System & Editor (操作系统与编辑器) ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# --- Log Files (日志) ---
+npm-debug.log*
+yarn-debug.log*
+
+# --- Cloud Development (云开发相关) ---
+# 如果云函数目录下有本地调试生成的临时文件
+cloudfunctions/*/.json
+!cloudfunctions/*/package.json
+!cloudfunctions/*/config.json

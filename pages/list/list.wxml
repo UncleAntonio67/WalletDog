@@ -1,0 +1,61 @@
+<view class="container">
+  <view class="header-bar">
+    <text>共 {{assetList.length}} 笔资产</text>
+    <text>净值更新于 {{updateTime}}</text>
+  </view>
+
+  <view wx:if="{{assetList.length === 0}}" class="empty-state">
+    <image class="empty-icon" src="/images/add.png" mode="aspectFit"></image>
+    <text>还没有资产，快去“记一笔”吧</text>
+  </view>
+
+  <view class="list-container">
+    <block wx:for="{{assetList}}" wx:key="id">
+      <view class="asset-card" bindlongpress="showDeleteOption" data-id="{{item.id}}" data-index="{{index}}">
+        
+        <view class="card-left">
+          <view class="row-1">
+            <text class="asset-name">{{item.name}}</text>
+            <text class="tag {{item.type==='银行存款'?'blue':(item.type==='股票/ETF'?'red':'orange')}}">{{item.type}}</text>
+          </view>
+          <view class="row-2">
+            <text class="rate-info">年化 {{item.annualRate}}%</text>
+          </view>
+        </view>
+
+        <view class="card-right">
+          <view class="amount">¥ {{item.balance}}</view>
+          <view class="profit {{item.dayIncome>=0?'text-up':'text-down'}}" wx:if="{{item.dayIncome != 0}}">
+            {{item.dayIncome>=0?'+':''}}{{item.dayIncome}}
+          </view>
+        </view>
+
+      </view>
+    </block>
+    <block wx:for="{{assetList}}" wx:key="id">
+      <view class="asset-card" bindtap="goToDetail" data-item="{{item}}" bindlongpress="showDeleteOption" data-id="{{item.id}}" data-index="{{index}}">
+        
+        <view class="card-left">
+          <view class="row-1">
+            <text class="asset-name">{{item.name}}</text>
+            <text class="tag {{item.type==='银行存款'?'blue':'orange'}}">{{item.type}}</text>
+          </view>
+          <view class="row-2">
+            <text wx:if="{{item.code}}">{{item.code}} </text>
+            <text class="{{item.rate >=0 ? 'text-up':'text-down'}}" wx:if="{{item.rate}}"> 
+               日涨跌: {{item.rate}}%
+            </text>
+          </view>
+        </view>
+
+        <view class="card-right">
+          <view class="amount">¥ {{item.balance}}</view>
+          <view class="profit {{item.dayIncome>=0?'text-up':'text-down'}}" wx:if="{{item.dayIncome}}">
+            今日: {{item.dayIncome>=0?'+':''}}{{item.dayIncome}}
+          </view>
+        </view>
+
+      </view>
+    </block>
+  </view>
+</view>
