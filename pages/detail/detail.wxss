@@ -1,5 +1,11 @@
 /* pages/detail/detail.wxss */
-.container { padding: 30rpx; padding-bottom: 60rpx; }
+.container {
+  padding: 30rpx;
+  
+  /* ✨ 核心修复：把这个数值改大 */
+  /* 之前可能设小了，改成 250rpx，保证能露出最后一行字 */
+  padding-bottom: 250rpx; 
+}
 
 /* 顶部卡片 */
 .header-card {
@@ -47,3 +53,25 @@
 /* 普通红绿文字 */
 .red { color: #E74C3C; font-weight: bold; }
 .green { color: #2ECC71; font-weight: bold; }
+
+/* 底部悬浮按钮栏 */
+.footer-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  padding: 20rpx 30rpx;
+  box-sizing: border-box;
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.05);
+  padding-bottom: constant(safe-area-inset-bottom); /* 适配全面屏 */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.add-btn {
+  background: #1A73E8;
+  color: #fff;
+  border-radius: 50rpx;
+  font-weight: bold;
+  font-size: 32rpx;
+}

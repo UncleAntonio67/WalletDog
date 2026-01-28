@@ -60,4 +60,9 @@
       <text>{{totalRate}}%</text>
     </view>
   </view>
-</view>
+
+  <view class="footer-action">
+    <button class="add-btn" bindtap="goAddPosition">➕ 加仓 / 记一笔</button>
+  </view>
+</view> 
+
