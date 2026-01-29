@@ -1,4 +1,6 @@
 {
-  "enablePullDownRefresh": true,
-  "usingComponents": {}
+  "navigationBarTitleText": "我的财富",
+  "usingComponents": {
+    "ec-canvas": "../../ec-canvas/ec-canvas"
+  }
 }

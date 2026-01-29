@@ -1,43 +1,48 @@
 <view class="container">
 
 <view class="header-card {{asset.type === '银行存款' ? 'bank-bg' : ''}}">
-  <view class="name-row">
+  <view class="header-top">
     <view class="name">{{asset.name}}</view>
-    <view class="tag" wx:if="{{asset.type === '银行存款'}}">银行存款</view>
-    <view class="code" wx:else>{{asset.code}}</view>
+    <view class="code-tag" wx:if="{{asset.type !== '银行存款'}}">{{asset.code}}</view>
+    <view class="code-tag bank-tag" wx:else>定期存款</view>
   </view>
 
-  <view class="balance-row">
-    <view class="label">{{asset.type === '银行存款' ? '存款本金 (元)' : '当前持有金额 (元)'}}</view>
-    <view class="amount">¥ {{asset.type === '银行存款' ? asset.principal : asset.balance}}</view>
+  <view class="header-main">
+    <view class="label">{{asset.type === '银行存款' ? '存款本金 (元)' : '持有金额 (元)'}}</view>
+    <view class="amount">{{asset.currentBalance || asset.balance}}</view>
   </view>
 
-  <view class="profit-row" wx:if="{{asset.type !== '银行存款'}}">
-    <view class="item">
-      <text class="p-label">最新净值</text>
-      <text class="p-value">{{asset.nav}}</text>
-    </view>
-    <view class="item">
-      <text class="p-label">日涨跌幅</text>
-      <text class="p-value {{asset.rate >= 0 ? 'red' : 'green'}}">{{asset.rate}}%</text>
-    </view>
-  </view>
-  
-  <view class="profit-row bank-row" wx:else>
-    <view class="item">
-      <text class="p-label">年化利率</text>
-      <text class="p-value">{{asset.annualRate}}%</text>
-    </view>
-    <view class="item">
-      <text class="p-label">预期利息</text>
-      <text class="p-value red">+{{depositInfo.interest}}</text>
-    </view>
+  <view class="header-bottom">
+    <block wx:if="{{asset.type === '银行存款'}}">
+      <view class="data-col">
+        <text class="d-val">{{asset.annualRate}}%</text>
+        <text class="d-lbl">年化利率</text>
+      </view>
+      <view class="divider"></view>
+      <view class="data-col">
+        <text class="d-val">+{{depositInfo.interest}}</text>
+        <text class="d-lbl">预期利息</text>
+      </view>
+    </block>
+    
+    <block wx:else>
+      <view class="data-col">
+        <text class="d-val">{{asset.nav}}</text>
+        <text class="d-lbl">最新净值</text>
+      </view>
+      <view class="divider"></view>
+      <view class="data-col">
+        <text class="d-val {{asset.displayRate >= 0 ? 'red-bg' : 'green-bg'}}">
+          {{asset.displayRate >= 0 ? '+' : ''}}{{asset.displayRate}}%
+        </text>
+        <text class="d-lbl">日涨跌幅</text>
+      </view>
+    </block>
   </view>
 </view>
 
 
 <block wx:if="{{asset.type === '银行存款'}}">
-  
   <view class="card progress-card">
     <view class="card-title">存期进度</view>
     <view class="progress-box">
@@ -50,7 +55,7 @@
       </view>
       <view class="tips">
         <text>起息日</text>
-        <text wx:if="{{depositInfo.daysLeft > 0}}">还有 {{depositInfo.daysLeft}} 天到期</text>
+        <text wx:if="{{depositInfo.daysLeft > 0}}">还有 {{depositInfo.daysLeft}} 天</text>
         <text wx:else class="red">已到期</text>
         <text>到期日</text>
       </view>
@@ -59,39 +64,29 @@
 
   <view class="card info-card">
     <view class="card-title">收益测算</view>
-    <view class="row">
-      <text>存入本金</text>
-      <text>¥ {{asset.principal}}</text>
-    </view>
-    <view class="row">
-      <text>存款期限</text>
-      <text>{{asset.depositTerm}}</text>
-    </view>
-    <view class="row">
-      <text>年化利率</text>
-      <text class="red">{{asset.annualRate}}%</text>
-    </view>
-    <view class="line"></view>
+    <view class="row"><text>存入本金</text><text>¥ {{asset.principal}}</text></view>
+    <view class="row"><text>存款期限</text><text>{{asset.depositTerm}}</text></view>
+    <view class="row"><text>年化利率</text><text class="red">{{asset.annualRate}}%</text></view>
     <view class="row big-row">
-      <text>到期本息合计</text>
+      <text class="total-label">到期本息合计</text>
       <text class="amount-text">¥ {{depositInfo.total}}</text>
     </view>
   </view>
-
 </block>
 
 
 <block wx:else>
-  
   <view class="card chart-card">
     <view class="chart-header">
       <view class="tab-item {{currentRange==='1m'?'active':''}}" bindtap="switchRange" data-range="1m">近1月</view>
       <view class="tab-item {{currentRange==='1y'?'active':''}}" bindtap="switchRange" data-range="1y">近1年</view>
       <view class="tab-item {{currentRange==='all'?'active':''}}" bindtap="switchRange" data-range="all">成立以来</view>
     </view>
+    
     <view class="chart-container">
       <ec-canvas id="mychart-dom-line" canvas-id="mychart-line" ec="{{ ec }}"></ec-canvas>
     </view>
+    
     <view class="chart-tip">数据来源：天天基金网</view>
   </view>
 
@@ -110,41 +105,22 @@
     </view>
     <view class="cost-tip">
       <text wx:if="{{asset.nav > costPrice}}">🎉 买入后已上涨，做得好！</text>
-      <text wx:elif="{{asset.nav < costPrice}}">📉 当前低于成本价，可考虑补仓拉低成本。</text>
+      <text wx:elif="{{asset.nav < costPrice}}">📉 当前低于成本价，可考虑补仓。</text>
       <text wx:else>⚖️ 刚刚回本。</text>
     </view>
   </view>
 
   <view class="card info-card">
     <view class="card-title">收益详情</view>
-    <view class="row">
-      <text>持有份额</text>
-      <text>{{asset.shares}} 份</text>
-    </view>
-    <view class="row">
-      <text>投入本金</text>
-      <text>¥ {{asset.principal}}</text>
-    </view>
-    <view class="row">
-      <text>累计盈亏</text>
-      <text class="{{fixedProfit >= 0 ? 'red' : 'green'}}">
-        {{fixedProfit >= 0 ? '+' : ''}}{{fixedProfit}}
-      </text>
-    </view>
-    <view class="row">
-      <text>累计收益率</text>
-      <text class="{{totalRate >= 0 ? 'red' : 'green'}}">{{totalRate}}%</text>
-    </view>
-    <view class="row">
-      <text>买入/建仓日期</text>
-      <text>{{asset.buyDate}}</text>
-    </view>
+    <view class="row"><text>持有份额</text><text>{{asset.shares}} 份</text></view>
+    <view class="row"><text>投入本金</text><text>¥ {{asset.principal}}</text></view>
+    <view class="row"><text>累计盈亏</text><text class="{{fixedProfit >= 0 ? 'red' : 'green'}}">{{fixedProfit >= 0 ? '+' : ''}}{{fixedProfit}}</text></view>
+    <view class="row"><text>累计收益率</text><text class="{{totalRate >= 0 ? 'red' : 'green'}}">{{totalRate}}%</text></view>
+    <view class="row"><text>买入日期</text><text>{{asset.buyDate}}</text></view>
   </view>
-
 </block>
 
 <view class="footer-action" wx:if="{{asset.type !== '银行存款'}}">
-    <button class="add-btn" bindtap="goAddPosition">➕ 加仓 / 记一笔</button>
-  </view>
-  
+  <button class="add-btn" bindtap="goAddPosition">➕ 加仓 / 记一笔</button>
+</view>
 </view>

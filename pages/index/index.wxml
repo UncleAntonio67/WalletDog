@@ -11,7 +11,7 @@
 
   <view class="card chart-card">
     <view class="card-title">资产分布</view>
-    <view class="chart-box">
+    <view class="chart-container">
       <ec-canvas id="mychart-dom-pie" canvas-id="mychart-pie" ec="{{ ec }}"></ec-canvas>
     </view>
   </view>
@@ -21,29 +21,36 @@
     
     <view class="asset-list">
       <block wx:for="{{assetList}}" wx:key="_id">
-        <navigator url="/pages/detail/detail?assetStr={{item}}" class="asset-item">
+        
+        <view class="asset-item" bindtap="goDetail" data-item="{{item}}">
           
           <view class="rank-num">{{index + 1}}</view>
 
           <view class="info-box">
-            <view class="asset-row-top">
+            <view class="row-top">
               <text class="asset-name">{{item.name}}</text>
               <text class="tag {{item.type==='银行存款'?'tag-gold':'tag-blue'}}">{{item.type}}</text>
             </view>
             
-            <view class="asset-row-bottom">
-              
-              <text wx:if="{{item.type === '银行存款'}}" class="rate-val gold">年化 {{item.displayRate}}%</text>
-              <text wx:else class="rate-val {{item.displayRate >= 0 ? 'red' : 'green'}}">
-                {{item.displayRate >= 0 ? '+' : ''}}{{item.displayRate}}%
-              </text>
-              
-              <text class="divider">|</text>
-              
-              <text class="profit-label">{{item.type==='银行存款' ? '日息' : '昨日'}}</text>
-              <text class="profit-num {{item.isPositive ? 'red' : 'green'}}">
-                {{item.dailyProfit > 0 ? '+' : ''}}{{item.dailyProfit}}
-              </text>
+            <view class="row-bottom">
+              <view class="data-block">
+                 <text wx:if="{{item.type === '银行存款'}}" class="lbl">年化</text>
+                 <text wx:else class="lbl">日涨</text>
+
+                 <text wx:if="{{item.type === '银行存款'}}" class="val gold">{{item.displayRate}}%</text>
+                 <text wx:else class="val {{item.displayRate >= 0 ? 'red' : 'green'}}">
+                   {{item.displayRate >= 0 ? '+' : ''}}{{item.displayRate}}%
+                 </text>
+              </view>
+
+              <view class="divider"></view>
+
+              <view class="data-block">
+                <text class="lbl">{{item.type==='银行存款' ? '日息' : '昨日'}}</text>
+                <text class="val {{item.isPositive ? 'red' : 'green'}}">
+                  {{item.dailyProfit > 0 ? '+' : ''}}{{item.dailyProfit}}
+                </text>
+              </view>
             </view>
           </view>
 
@@ -52,7 +59,7 @@
             <view class="arrow">></view>
           </view>
 
-        </navigator>
+        </view>
         <view class="line" wx:if="{{index < assetList.length - 1}}"></view>
       </block>
       
@@ -61,5 +68,4 @@
       </view>
     </view>
   </view>
-
 </view>

@@ -8,37 +8,40 @@ let chartInstance = null;
 
 Page({
   data: {
-    totalAsset: '0.00',    // 总资产
-    totalDayProfit: '0.00',// 昨日总收益
-    assetList: [],         // 列表数据
-    ec: {
-      lazyLoad: true       // 延迟加载，必须为 true
-    }
+    totalAsset: '0.00',
+    totalDayProfit: '0.00',
+    assetList: [],
+    ec: { lazyLoad: true }
   },
 
   onShow() {
-    // 1. 防崩溃检查
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().init();
     }
-    
-    // 2. 刷新数据
     this.loadAssets();       
   },
 
-  // 加载数据库资产
-  loadAssets() {
-    wx.showLoading({ title: '刷新资产...' });
+  // ✨✨✨ 关键修复：安全的跳转方法 ✨✨✨
+  goDetail(e) {
+    const item = e.currentTarget.dataset.item;
+    // 1. 转字符串
+    const jsonStr = JSON.stringify(item);
+    // 2. URL编码 (防止中文或特殊符号截断)
+    const encodedStr = encodeURIComponent(jsonStr);
     
+    wx.navigateTo({
+      url: `/pages/detail/detail?assetStr=${encodedStr}`
+    });
+  },
+
+  loadAssets() {
+    wx.showLoading({ title: '刷新...' });
     db.collection('assets').get().then(res => {
       const assets = res.data;
-      
-      // 提取需要查行情的代码 (排除银行存款)
       const codes = assets
         .filter(item => item.type !== '银行存款' && item.code)
         .map(item => item.code);
 
-      // 获取实时行情
       if (codes.length > 0) {
         this.fetchRealTimeData(assets, codes);
       } else {
@@ -50,7 +53,6 @@ Page({
     });
   },
 
-  // 获取云端行情
   fetchRealTimeData(assets, codes) {
     wx.cloud.callFunction({
       name: 'getFundData',
@@ -72,12 +74,9 @@ Page({
     });
   },
 
-  // 核心计算逻辑
   processData(assets, marketData) {
     let total = 0;
     let dayProfitTotal = 0;
-    
-    // 饼图数据统计
     let typeMap = { '银行存款': 0, '公募基金': 0, '股票/ETF': 0, '定期理财': 0, '其他': 0 };
 
     const processedList = assets.map(item => {
@@ -85,20 +84,15 @@ Page({
       let displayRate = 0;  
       let currentBalance = parseFloat(item.balance);
 
-      // A. 存款计算
       if (item.type === '银行存款') {
         const rate = parseFloat(item.annualRate || 0);
         displayRate = rate; 
-        // 日息 = 本金 * 年利率% / 365
         dailyProfit = parseFloat(item.principal) * (rate / 100) / 365;
         currentBalance = parseFloat(item.principal); 
-      } 
-      // B. 基金/股票计算
-      else {
+      } else {
         const market = marketData[item.code];
         if (market) {
           displayRate = market.rate; 
-          // 昨日盈亏 = 金额 * 涨跌幅%
           dailyProfit = currentBalance * (market.rate / 100);
         } else {
           displayRate = 0;
@@ -108,12 +102,8 @@ Page({
       total += currentBalance;
       dayProfitTotal += dailyProfit;
 
-      // 累加分类
-      if (typeMap[item.type] !== undefined) {
-        typeMap[item.type] += currentBalance;
-      } else {
-        typeMap['其他'] += currentBalance;
-      }
+      if (typeMap[item.type] !== undefined) typeMap[item.type] += currentBalance;
+      else typeMap['其他'] += currentBalance;
 
       return {
         ...item,
@@ -124,7 +114,6 @@ Page({
       };
     });
 
-    // 按余额降序
     processedList.sort((a, b) => b.currentBalance - a.currentBalance);
 
     this.setData({
@@ -135,66 +124,32 @@ Page({
 
     wx.hideLoading();
 
-    // ✨✨✨ 修复图表不显示的问题：加一点点延时，确保 DOM 准备好 ✨✨✨
-    setTimeout(() => {
-      this.initChart(typeMap);
-    }, 200);
+    // 延迟初始化图表
+    setTimeout(() => { this.initChart(typeMap); }, 500);
   },
 
-  // 初始化/更新图表
   initChart(typeMap) {
-    const chartData = Object.keys(typeMap)
-      .filter(key => typeMap[key] > 0)
-      .map(key => ({
-        name: key,
-        value: typeMap[key].toFixed(2)
-      }));
-    
+    const chartData = Object.keys(typeMap).filter(key => typeMap[key] > 0).map(key => ({ name: key, value: typeMap[key].toFixed(2) }));
     if (chartData.length === 0) return;
 
+    const ecComponent = this.selectComponent('#mychart-dom-pie');
+    if (!ecComponent) return;
+
     const option = {
-      // 经典的金融配色
       color: ['#1A73E8', '#F0B90B', '#34A853', '#EA4335', '#909399'],
-      tooltip: { 
-        trigger: 'item',
-        formatter: '{b}: {c} ({d}%)' // 显示百分比
-      },
-      legend: { 
-        orient: 'vertical',
-        right: '5%',
-        top: 'center',
-        itemWidth: 10, 
-        itemHeight: 10 
-      },
+      tooltip: { trigger: 'item', formatter: '{b}\n{c} ({d}%)' },
       series: [{
-        name: '资产分布',
-        type: 'pie',
-        radius: ['45%', '70%'], // 环形大小
-        center: ['35%', '50%'], // 把饼图稍微往左移，给图例留空间
-        avoidLabelOverlap: false,
-        label: { show: false, position: 'center' },
-        emphasis: {
-          label: { show: true, fontSize: '14', fontWeight: 'bold' }
-        },
+        name: '资产分布', type: 'pie', radius: ['40%', '70%'], center: ['50%', '50%'],
+        avoidLabelOverlap: false, label: { show: false, position: 'center' },
+        emphasis: { label: { show: true, fontSize: '14', fontWeight: 'bold' } },
         data: chartData
       }]
     };
 
-    const ecComponent = this.selectComponent('#mychart-dom-pie');
-    
-    if (!ecComponent) {
-      console.warn('找不到图表组件');
-      return;
-    }
-
-    if (!chartInstance) {
-      ecComponent.init((canvas, width, height, dpr) => {
-        chartInstance = echarts.init(canvas, null, { width, height, devicePixelRatio: dpr });
-        chartInstance.setOption(option);
-        return chartInstance;
-      });
-    } else {
+    ecComponent.init((canvas, width, height, dpr) => {
+      chartInstance = echarts.init(canvas, null, { width, height, devicePixelRatio: dpr });
       chartInstance.setOption(option);
-    }
+      return chartInstance;
+    });
   }
 });

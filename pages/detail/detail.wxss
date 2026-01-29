@@ -1,337 +1,126 @@
 /* pages/detail/detail.wxss */
-.container {
-  padding: 30rpx;
+page {
   background-color: #f6f7f9;
-  min-height: 100vh;
-  
-  /* ✨ 修改点：默认留小一点的空，按钮显示时会被盖住一部分也没关系，或者用 padding-bottom 动态控制比较麻烦 */
-  /* 建议直接改为： */
-  padding-bottom: 60rpx; 
-  /* 如果有底部按钮，按钮是 fixed 定位的，会浮在上面 */
+  font-family: -apple-system, sans-serif;
+  padding-bottom: 60rpx;
 }
 
-/* ======================== */
-/* 1. 顶部资产卡片 (通用) */
-/* ======================== */
+.container { padding: 30rpx; }
+
+/* 1. 顶部卡片 (重构版) */
 .header-card {
-  background: linear-gradient(135deg, #1A73E8, #4285F4); /* 默认蓝色背景 */
-  border-radius: 24rpx;
-  padding: 40rpx;
+  background: linear-gradient(135deg, #1A73E8, #4285F4);
   color: #fff;
+  padding: 40rpx;
+  border-radius: 24rpx;
   box-shadow: 0 10rpx 20rpx rgba(26, 115, 232, 0.3);
   margin-bottom: 30rpx;
-  position: relative;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 银行存款专用背景 (金色) */
 .header-card.bank-bg {
   background: linear-gradient(135deg, #F0B90B, #F7931A);
-  box-shadow: 0 10rpx 20rpx rgba(247, 147, 26, 0.3);
+  box-shadow: 0 10rpx 20rpx rgba(240, 185, 11, 0.3);
 }
 
-.name-row {
+/* 顶部：名字+代码 */
+.header-top {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 30rpx;
 }
-
 .name {
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: bold;
   max-width: 70%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.4;
 }
-
-.code, .tag {
+.code-tag {
+  font-size: 22rpx;
   background: rgba(255, 255, 255, 0.2);
-  padding: 6rpx 16rpx;
-  border-radius: 12rpx;
-  font-size: 24rpx;
-  font-family: monospace; /* 代码用等宽字体看起来更专业 */
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
 }
 
-.balance-row {
-  margin-bottom: 30rpx;
-}
+/* 中间：金额 */
+.header-main { margin-bottom: 40rpx; }
+.header-main .label { font-size: 24rpx; opacity: 0.8; margin-bottom: 10rpx; }
+.header-main .amount { font-size: 60rpx; font-weight: bold; font-family: 'DIN', sans-serif; }
 
-.label {
-  font-size: 24rpx;
-  opacity: 0.9;
-  margin-bottom: 10rpx;
-}
-
-.amount {
-  font-size: 60rpx;
-  font-weight: bold;
-}
-
-.profit-row {
+/* 底部：两列数据 */
+.header-bottom {
   display: flex;
-  justify-content: space-between;
-  background: rgba(0, 0, 0, 0.1); /* 稍微深一点的背景条 */
-  border-radius: 12rpx;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05); /* 轻微底色区分 */
+  border-radius: 16rpx;
   padding: 20rpx;
 }
-
-.item {
+.data-col {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
+.d-val { font-size: 32rpx; font-weight: bold; margin-bottom: 6rpx; }
+.d-lbl { font-size: 22rpx; opacity: 0.8; }
+.header-bottom .divider { width: 1rpx; height: 30rpx; background: rgba(255,255,255,0.3); }
 
-.p-label {
-  font-size: 22rpx;
-  opacity: 0.8;
-  margin-bottom: 6rpx;
-}
-
-.p-value {
-  font-size: 28rpx;
-  font-weight: bold;
-}
-
-/* 涨跌幅颜色 (在深色背景上，红色稍微亮一点，绿色也亮一点) */
-.red { color: #FFCDD2; }
-.green { color: #C8E6C9; }
-
-
-/* ======================== */
-/* 2. 通用卡片容器 */
-/* ======================== */
+/* 通用卡片 */
 .card {
   background: #fff;
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   padding: 30rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.02);
+  margin-bottom: 30rpx;
 }
-
 .card-title {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 24rpx;
-  border-left: 8rpx solid #1A73E8;
-  padding-left: 20rpx;
+  font-size: 30rpx; font-weight: bold; color: #333;
+  margin-bottom: 24rpx; border-left: 8rpx solid #1A73E8; padding-left: 16rpx;
 }
 
-/* ======================== */
-/* 3. 图表卡片样式 */
-/* ======================== */
-.chart-header {
-  display: flex;
-  margin-bottom: 20rpx;
-  border-bottom: 1rpx solid #eee;
-}
-
-.tab-item {
-  padding: 10rpx 30rpx;
-  font-size: 28rpx;
-  color: #999;
-  position: relative;
-}
-
-.tab-item.active {
-  color: #1A73E8;
-  font-weight: bold;
-}
-
-.tab-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2rpx;
-  left: 20%;
-  width: 60%;
-  height: 4rpx;
-  background: #1A73E8;
-  border-radius: 4rpx;
-}
-
+/* ✨✨✨ 图表容器样式 (关键：必须有固定高度) ✨✨✨ */
 .chart-container {
   width: 100%;
-  height: 400rpx; /* ✨ 必须给高度，否则图表不显示！ */
-  position: relative;
-}
-
-/* 自定义 ec-canvas 标签的宽高 */
-ec-canvas {
-  width: 100%;
-  height: 100%;
+  height: 500rpx; /* 强制高度 */
   display: block;
 }
+ec-canvas { width: 100%; height: 100%; }
 
-.chart-tip {
-  text-align: right;
-  font-size: 22rpx;
-  color: #ccc;
-  margin-top: 10rpx;
+.chart-header { display: flex; justify-content: center; margin-bottom: 20rpx; }
+.tab-item {
+  padding: 10rpx 30rpx; font-size: 26rpx; color: #666;
+  border-radius: 30rpx; margin: 0 10rpx; transition: all 0.2s;
 }
+.tab-item.active { background: #E8F0FE; color: #1A73E8; font-weight: bold; }
+.chart-tip { font-size: 20rpx; color: #ccc; text-align: right; margin-top: 10rpx; }
 
+/* 成本分析 */
+.cost-comparison { display: flex; align-items: center; justify-content: space-around; padding: 20rpx 0; }
+.cost-item { display: flex; flex-direction: column; align-items: center; }
+.c-val { font-size: 36rpx; font-weight: bold; margin-bottom: 8rpx; }
+.c-lbl { font-size: 24rpx; color: #999; }
+.vs-icon { font-size: 24rpx; color: #ddd; font-weight: bold; font-style: italic; }
+.cost-tip { text-align: center; font-size: 26rpx; color: #666; margin-top: 20rpx; background: #f9f9f9; padding: 16rpx; border-radius: 12rpx; }
 
-/* ======================== */
-/* 4. 持仓成本分析卡片 */
-/* ======================== */
-.cost-comparison {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 30rpx 0;
-  border-bottom: 1rpx dashed #f0f0f0;
-}
+/* 列表行 */
+.row { display: flex; justify-content: space-between; margin-bottom: 20rpx; font-size: 28rpx; color: #555; }
+.big-row { margin-top: 20rpx; padding-top: 20rpx; border-top: 1rpx solid #eee; align-items: center; }
+.total-label { font-weight: bold; color: #333; }
+.amount-text { font-size: 44rpx; font-weight: bold; color: #F0B90B; font-family: 'DIN', sans-serif; }
 
-.cost-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+/* 颜色 */
+.red { color: #EA4335; }
+.green { color: #34A853; }
+.red-bg { color: #fff; background: #EA4335; padding: 0 8rpx; border-radius: 6rpx; }
+.green-bg { color: #fff; background: #34A853; padding: 0 8rpx; border-radius: 6rpx; }
 
-.c-val {
-  font-size: 44rpx;
-  font-weight: bold;
-  margin-bottom: 8rpx;
-  color: #333;
-}
+/* 底部按钮 */
+.footer-action { padding: 20rpx 0; }
+.add-btn { background: #1A73E8; color: #fff; border-radius: 50rpx; font-size: 32rpx; font-weight: bold; }
 
-.c-val.red { color: #E04F4F; }
-.c-val.green { color: #2BA245; }
-
-.c-lbl {
-  font-size: 24rpx;
-  color: #999;
-}
-
-.vs-icon {
-  font-size: 36rpx;
-  color: #E0E0E0;
-  font-weight: bold;
-  font-style: italic;
-  font-family: serif;
-}
-
-.cost-tip {
-  padding-top: 24rpx;
-  text-align: center;
-  font-size: 26rpx;
-  color: #666;
-  background: #fafafa;
-  margin-top: 20rpx;
-  padding: 16rpx;
-  border-radius: 12rpx;
-}
-
-
-/* ======================== */
-/* 5. 详细信息行样式 */
-/* ======================== */
-.info-card .row {
-  display: flex;
-  justify-content: space-between;
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid #f9f9f9;
-  font-size: 28rpx;
-}
-
-.info-card .row:last-child {
-  border-bottom: none;
-}
-
-.info-card text:first-child {
-  color: #888;
-}
-
-.info-card text:last-child {
-  color: #333;
-  font-weight: 500;
-}
-
-/* ======================== */
-/* 6. 底部按钮样式 */
-/* ======================== */
-.footer-action {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #fff;
-  padding: 20rpx 30rpx;
-  box-sizing: border-box;
-  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.05);
-  padding-bottom: constant(safe-area-inset-bottom);
-  padding-bottom: env(safe-area-inset-bottom);
-  z-index: 99;
-}
-
-.add-btn {
-  background: #1A73E8;
-  color: #fff;
-  border-radius: 50rpx;
-  font-weight: bold;
-  font-size: 32rpx;
-  box-shadow: 0 8rpx 16rpx rgba(26, 115, 232, 0.3);
-}
-
-/* 存款专用进度条样式 */
-.progress-box {
-  padding: 10rpx 0 20rpx;
-}
-
-.dates, .tips {
-  display: flex;
-  justify-content: space-between;
-  font-size: 24rpx;
-  color: #999;
-  margin-bottom: 10rpx;
-}
-
-.tips {
-  margin-top: 10rpx;
-  margin-bottom: 0;
-}
-
-.bar-bg {
-  width: 100%;
-  height: 16rpx;
-  background: #f0f0f0;
-  border-radius: 10rpx;
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #F0B90B, #F7931A); /* 金色进度条 */
-  border-radius: 10rpx;
-  transition: width 1s ease;
-}
-
-/* 本息合计大字体 */
-.big-row {
-  margin-top: 30rpx;       /* 拉大与上方信息的距离 */
-  padding-top: 30rpx;      /* 拉大内容与线的距离 */
-  border-top: 1rpx solid #E5E5E5; /* ✨ 改为清晰的浅灰色实线，不再用虚线 */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-/* 左边的文字 */
-.total-label {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: #333;
-}
-
-.amount-text {
-  font-size: 48rpx;        /* ✨ 字体加大，更震撼 */
-  font-family: "DIN", "Helvetica Neue", sans-serif; /* 尝试用数字字体(如果系统有) */
-  font-weight: bold;
-  color: #F7931A;          /* 保持金色 */
-  letter-spacing: 2rpx;    /* 增加一点字间距 */
-}
-
-.line {
-  height: 1rpx;
-  background: #f5f5f5;
-  margin: 10rpx 0;
-}
+/* 存款进度条 */
+.progress-box { padding: 10rpx 0 20rpx; }
+.dates, .tips { display: flex; justify-content: space-between; font-size: 24rpx; color: #999; margin-bottom: 10rpx; }
+.bar-bg { width: 100%; height: 16rpx; background: #f0f0f0; border-radius: 10rpx; overflow: hidden; }
+.bar-fill { height: 100%; background: linear-gradient(90deg, #F0B90B, #F7931A); border-radius: 10rpx; }
