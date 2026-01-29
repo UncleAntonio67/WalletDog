@@ -1,55 +1,355 @@
 /* pages/add/add.wxss */
-.container { padding: 30rpx; background: #F6F7F9; min-height: 100vh; }
 
+/* ✨✨✨ 1. 全局字体统筹 ✨✨✨ */
+page {
+  /* 优先使用系统默认的高级无衬线字体 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
+    sans-serif;
+  background-color: #f6f7f9;
+  color: #333;
+}
+
+.container {
+  padding: 30rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* 卡片容器 */
 .card {
   background: #fff;
-  border-radius: 16rpx;
-  padding: 0 30rpx;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
   margin-bottom: 30rpx;
-  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.02);
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.04);
 }
 
 .title {
-  font-size: 28rpx;
-  color: #999;
-  padding: 30rpx 0 10rpx;
-  border-bottom: 1rpx solid #f5f5f5;
-  margin-bottom: 10rpx;
-}
-
-.form-item {
+  font-size: 32rpx;
+  font-weight: 600; /* 半粗体，比bold更精致 */
+  color: #222;
+  margin-bottom: 32rpx;
   display: flex;
   align-items: center;
-  padding: 35rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.title::before {
+  content: '';
+  display: inline-block;
+  width: 8rpx;
+  height: 32rpx;
+  background: #1A73E8;
+  border-radius: 4rpx;
+  margin-right: 20rpx;
+}
+
+.sub-title {
+  font-size: 24rpx;
+  color: #999;
+  font-weight: normal;
+  margin-left: 12rpx;
+}
+
+/* 表单行 */
+.form-item {
+  margin-bottom: 36rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #555;
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+/* ✨✨✨ 2. 统一输入框与选择器样式 ✨✨✨ */
+.input-styled, .picker-wrapper {
+  background: #F7F8FA; /* 极淡的灰背景 */
+  border-radius: 16rpx; /* 更大的圆角 */
+  height: 96rpx;        /* 增加高度，便于点击 */
+  padding: 0 30rpx;
+  font-size: 30rpx;
+  color: #333;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  transition: background 0.2s;
+}
+
+/* 点击态反馈 */
+.input-styled:active, .picker-wrapper:active {
+  background: #F0F2F5;
+}
+
+/* 统一 Placeholder 样式 */
+.placeholder-style {
+  color: #BBBBBB;
   font-size: 30rpx;
 }
-.form-item:last-child { border-bottom: none; }
 
-.label { width: 160rpx; color: #333; font-weight: 500; }
-input { flex: 1; color: #333; }
-.picker-value { flex: 1; color: #333; }
-
-.status {
-  font-size: 24rpx; color: #1A73E8;
+.input-styled.disabled {
+  color: #999;
+  background: #FAFAFA;
 }
 
-.result-box {
+.picker-wrapper {
+  justify-content: space-between;
+}
+
+.picker-text {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ✨✨✨ 3. CSS 绘制图标 (去 Emoji 化) ✨✨✨ */
+
+/* 箭头图标 (CSS 三角) */
+/* 箭头图标 (CSS Chevron) - 加深加粗 */
+.icon-arrow {
+  width: 18rpx;              /* 尺寸加大 */
+  height: 18rpx;
+  border-right: 5rpx solid #666; /* 颜色加深 (#CCC -> #666)，线条加粗 */
+  border-bottom: 5rpx solid #666;
+  transform: rotate(45deg);
+  margin-right: 8rpx;        /* 给右边留点呼吸空间 */
+  margin-bottom: 6rpx;       /* 视觉居中修正 */
+}
+
+/* 日历图标 (CSS 绘制) - 加深 */
+.icon-calendar {
+  width: 34rpx;
+  height: 32rpx;
+  border: 4rpx solid #555;   /* 颜色加深 */
+  border-radius: 6rpx;
+  position: relative;
+  margin-right: 8rpx;
+}
+
+/* 日历的小盖子 */
+.icon-calendar::before {
+  content: '';
+  position: absolute;
+  top: -6rpx;
+  left: 6rpx;
+  width: 22rpx;
+  height: 5rpx;
+  background: #555;      /* 颜色加深 */
+  border-radius: 4rpx;
+}
+
+/* 日历里面的小点点 */
+.icon-calendar::after {
+  content: '';
+  position: absolute;
+  top: 10rpx;
+  left: 8rpx;
+  width: 5rpx;
+  height: 5rpx;
+  background: #555;      /* 颜色加深 */
+  box-shadow: 10rpx 0 0 #555, 0 10rpx 0 #555, 10rpx 10rpx 0 #555;
+}
+
+/* 也可以给 Picker 的背景稍微加深一点，突出层次 */
+.picker-wrapper {
+  background: #F0F2F5; /* 比纯白深一点，比输入框更像按钮 */
+  border: 1rpx solid transparent; /* 预留边框位置 */
+}
+
+/* 点击时边框变蓝，增加交互感 */
+.picker-wrapper:active {
   background: #E8F0FE;
-  padding: 20rpx;
-  border-radius: 8rpx;
+  border-color: #1A73E8;
+}
+
+.picker-text {
+  color: #333;
+  font-weight: 500; /* 文字稍微加粗一点点 */
+}
+
+
+/* ✨✨✨ 4. 胶囊与标签 ✨✨✨ */
+.capsule-box {
+  display: flex;
+  background: #EFF1F5;
+  border-radius: 48rpx;
+  padding: 8rpx;
+  height: 88rpx;
+}
+
+.capsule-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #777;
+  border-radius: 40rpx;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.capsule-item.active.buy {
+  background: #fff;
+  color: #1A73E8;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(26, 115, 232, 0.15);
+}
+
+.capsule-item.active.sell {
+  background: #fff;
+  color: #F76B1C;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(247, 107, 28, 0.15);
+}
+
+/* 银行存款固定标签 (极简风) */
+.static-tag {
+  display: flex;
+  align-items: center;
+  background: rgba(26, 115, 232, 0.08); /* 极淡的蓝色背景 */
+  color: #1A73E8;
+  padding: 0 30rpx;
+  height: 96rpx;
+  border-radius: 16rpx;
+  font-weight: 600;
+  font-size: 28rpx;
+}
+
+/* 简单的圆点装饰代替 Emoji */
+.dot {
+  width: 12rpx;
+  height: 12rpx;
+  background: #1A73E8;
+  border-radius: 50%;
+  margin-right: 16rpx;
+}
+
+/* 结果文字 */
+.result-box {
+  text-align: right;
+  font-size: 26rpx;
+  color: #666;
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx dashed #eee;
+}
+
+.highlight {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #1A73E8;
+  font-family: -apple-system, sans-serif; /* 强制数字也用系统字体 */
+}
+
+/* 底部按钮 */
+.save-btn {
+  background: #1A73E8; /* 纯色背景更符合扁平化，或者微渐变 */
+  color: #fff;
+  border-radius: 56rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  height: 104rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12rpx 30rpx rgba(26, 115, 232, 0.3);
+  margin-top: 60rpx;
+  border: none;
+  letter-spacing: 2rpx;
+}
+
+.save-btn.btn-sell {
+  background: #F76B1C;
+  box-shadow: 0 12rpx 30rpx rgba(247, 107, 28, 0.3);
+}
+
+.save-btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* ✨✨✨ 新增：代码输入框 + 选持仓按钮 布局 ✨✨✨ */
+
+.code-box {
+  display: flex;
+  align-items: center;
+  gap: 20rpx; /* 两个元素之间的间距 */
+}
+
+/* 输入框占满剩余空间 */
+.code-input {
+  flex: 1;
+}
+
+/* 选持仓按钮 */
+.select-btn {
+  height: 96rpx;
+  padding: 0 30rpx;
+  background: #E8F0FE; /* 浅蓝色背景 */
+  color: #1A73E8;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap; /* 防止文字换行 */
+  transition: opacity 0.2s;
+}
+
+.select-btn:active {
+  opacity: 0.7;
+}
+
+/* ✨✨✨ 手续费快选标签 ✨✨✨ */
+.label-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 30rpx;
-  font-size: 28rpx;
-  color: #1A73E8;
+  align-items: center;
+  margin-bottom: 16rpx;
 }
-.highlight { font-weight: bold; }
 
-.save-btn {
-  margin-top: 60rpx;
-  background: #1A73E8;
-  color: #fff;
-  border-radius: 50rpx;
-  font-weight: bold;
+/* 标签容器 */
+.rate-tags {
+  display: flex;
+  gap: 12rpx;
+}
+
+/* 标签样式 */
+.rate-tag {
+  font-size: 22rpx;
+  color: #666;
+  background: #F0F2F5;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid transparent;
+  transition: all 0.2s;
+}
+
+/* 选中状态 */
+.rate-tag.selected {
+  color: #1A73E8;
+  background: #E8F0FE;
+  border-color: #1A73E8;
+  font-weight: 500;
+}
+
+/* 手续费智能提示文字 */
+.auto-tip {
+  font-size: 24rpx;
+  color: #1A73E8;
+  background: rgba(26, 115, 232, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+
+/* 调整一下费率标签的间距 */
+.rate-tags {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 16rpx; /* 让标签和输入框之间有点距离 */
+  flex-wrap: wrap; /* 防止小屏手机换行 */
 }

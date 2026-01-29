@@ -3,18 +3,18 @@
 <view class="header-card {{asset.type === '银行存款' ? 'bank-bg' : ''}}">
   <view class="name-row">
     <view class="name">{{asset.name}}</view>
-    <view class="code" wx:if="{{asset.type !== '银行存款'}}">{{asset.code}}</view>
-    <view class="tag" wx:else>银行存款</view>
+    <view class="tag" wx:if="{{asset.type === '银行存款'}}">银行存款</view>
+    <view class="code" wx:else>{{asset.code}}</view>
   </view>
 
   <view class="balance-row">
-    <view class="label">当前持有金额 (元)</view>
-    <view class="amount">¥ {{asset.balance}}</view>
+    <view class="label">{{asset.type === '银行存款' ? '存款本金 (元)' : '当前持有金额 (元)'}}</view>
+    <view class="amount">¥ {{asset.type === '银行存款' ? asset.principal : asset.balance}}</view>
   </view>
 
   <view class="profit-row" wx:if="{{asset.type !== '银行存款'}}">
     <view class="item">
-      <text class="p-label">最新净值 ({{asset.date || '--'}})</text>
+      <text class="p-label">最新净值</text>
       <text class="p-value">{{asset.nav}}</text>
     </view>
     <view class="item">
@@ -22,14 +22,45 @@
       <text class="p-value {{asset.rate >= 0 ? 'red' : 'green'}}">{{asset.rate}}%</text>
     </view>
   </view>
+  
+  <view class="profit-row bank-row" wx:else>
+    <view class="item">
+      <text class="p-label">年化利率</text>
+      <text class="p-value">{{asset.annualRate}}%</text>
+    </view>
+    <view class="item">
+      <text class="p-label">预期利息</text>
+      <text class="p-value red">+{{depositInfo.interest}}</text>
+    </view>
+  </view>
 </view>
 
 
 <block wx:if="{{asset.type === '银行存款'}}">
+  
+  <view class="card progress-card">
+    <view class="card-title">存期进度</view>
+    <view class="progress-box">
+      <view class="dates">
+        <text>{{asset.buyDate}}</text>
+        <text>{{depositInfo.endDate}}</text>
+      </view>
+      <view class="bar-bg">
+        <view class="bar-fill" style="width: {{depositInfo.progress}}%"></view>
+      </view>
+      <view class="tips">
+        <text>起息日</text>
+        <text wx:if="{{depositInfo.daysLeft > 0}}">还有 {{depositInfo.daysLeft}} 天到期</text>
+        <text wx:else class="red">已到期</text>
+        <text>到期日</text>
+      </view>
+    </view>
+  </view>
+
   <view class="card info-card">
-    <view class="card-title">存款信息</view>
+    <view class="card-title">收益测算</view>
     <view class="row">
-      <text>本金</text>
+      <text>存入本金</text>
       <text>¥ {{asset.principal}}</text>
     </view>
     <view class="row">
@@ -40,11 +71,13 @@
       <text>年化利率</text>
       <text class="red">{{asset.annualRate}}%</text>
     </view>
-    <view class="row">
-      <text>买入日期</text>
-      <text>{{asset.buyDate}}</text>
+    <view class="line"></view>
+    <view class="row big-row">
+      <text>到期本息合计</text>
+      <text class="amount-text">¥ {{depositInfo.total}}</text>
     </view>
   </view>
+
 </block>
 
 
@@ -110,7 +143,8 @@
 
 </block>
 
-<view class="footer-action">
-  <button class="add-btn" bindtap="goAddPosition">➕ 加仓 / 记一笔</button>
-</view>
+<view class="footer-action" wx:if="{{asset.type !== '银行存款'}}">
+    <button class="add-btn" bindtap="goAddPosition">➕ 加仓 / 记一笔</button>
+  </view>
+  
 </view>

@@ -1,52 +1,65 @@
 <view class="container">
+  
   <view class="header-card">
-    <view class="card-content">
-      <text class="label">总资产 (元)</text>
-      <view class="total-amount">¥ {{totalBalance}}</view>
-      <view class="profit-row">
-        <text>累计盈亏：</text>
-        <text class="{{totalProfit >= 0 ? 'text-up' : 'text-down'}}">{{totalProfit >= 0 ? '+' : ''}}{{totalProfit}}</text>
-      </view>
+    <view class="total-label">总资产 (元)</view>
+    <view class="total-amount">{{totalAsset}}</view>
+    <view class="today-profit">
+      <text>昨日收益</text>
+      <text class="profit-val {{totalDayProfit.includes('-')?'green':'red'}}">{{totalDayProfit}}</text>
     </view>
   </view>
 
   <view class="card chart-card">
     <view class="card-title">资产分布</view>
-    <view class="chart-container">
-      <view class="pie-chart"></view>
-      <view class="legend">
-        <view class="legend-item"><view class="dot color-1"></view> 银行存款 30%</view>
-        <view class="legend-item"><view class="dot color-2"></view> 公募基金 45%</view>
-        <view class="legend-item"><view class="dot color-3"></view> 定期理财 20%</view>
-        <view class="legend-item"><view class="dot color-4"></view> 其他 5%</view>
+    <view class="chart-box">
+      <ec-canvas id="mychart-dom-pie" canvas-id="mychart-pie" ec="{{ ec }}"></ec-canvas>
+    </view>
+  </view>
+
+  <view class="card list-card">
+    <view class="card-title">资产列表 (按余额)</view>
+    
+    <view class="asset-list">
+      <block wx:for="{{assetList}}" wx:key="_id">
+        <navigator url="/pages/detail/detail?assetStr={{item}}" class="asset-item">
+          
+          <view class="rank-num">{{index + 1}}</view>
+
+          <view class="info-box">
+            <view class="asset-row-top">
+              <text class="asset-name">{{item.name}}</text>
+              <text class="tag {{item.type==='银行存款'?'tag-gold':'tag-blue'}}">{{item.type}}</text>
+            </view>
+            
+            <view class="asset-row-bottom">
+              
+              <text wx:if="{{item.type === '银行存款'}}" class="rate-val gold">年化 {{item.displayRate}}%</text>
+              <text wx:else class="rate-val {{item.displayRate >= 0 ? 'red' : 'green'}}">
+                {{item.displayRate >= 0 ? '+' : ''}}{{item.displayRate}}%
+              </text>
+              
+              <text class="divider">|</text>
+              
+              <text class="profit-label">{{item.type==='银行存款' ? '日息' : '昨日'}}</text>
+              <text class="profit-num {{item.isPositive ? 'red' : 'green'}}">
+                {{item.dailyProfit > 0 ? '+' : ''}}{{item.dailyProfit}}
+              </text>
+            </view>
+          </view>
+
+          <view class="amount-box">
+            <view class="balance">¥ {{item.currentBalance}}</view>
+            <view class="arrow">></view>
+          </view>
+
+        </navigator>
+        <view class="line" wx:if="{{index < assetList.length - 1}}"></view>
+      </block>
+      
+      <view wx:if="{{assetList.length === 0}}" class="empty-tip">
+        暂无资产，快去记一笔吧
       </view>
     </view>
   </view>
 
-  <view class="card ranking-card">
-    <view class="card-title">收益榜单 (按余额排序)</view>
-    <view class="ranking-list">
-      <block wx:for="{{rankingList}}" wx:key="id">
-        <view class="ranking-item" bindtap="goToDetail" data-item="{{item}}">
-          <view class="rank-num {{index < 3 ? 'top-three' : ''}}">{{index + 1}}</view>
-          <view class="product-info">
-            <view class="name">{{item.name}}</view>
-            <view class="rate {{item.rate >= 0 ? 'text-up' : 'text-down'}}">
-              {{item.rate}}% (日涨跌)
-            </view>
-          </view>
-          <view class="income-box">
-             <view class="income-val {{item.dayIncome >= 0 ? 'text-up' : 'text-down'}}">
-               {{item.dayIncome >= 0 ? '+' : ''}}{{item.dayIncome}}
-             </view>
-             <view class="total-bal">¥{{item.balance}}</view>
-          </view>
-        </view>
-      </block>
-    </view>
-  </view>
-
-  <view class="fab" bindtap="goToAdd">
-    <image class="plus-icon" src="/images/add-active.png"></image>
-  </view>
 </view>

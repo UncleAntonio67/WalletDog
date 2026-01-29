@@ -4,75 +4,143 @@
     <view class="form-item">
       <view class="label">产品类型</view>
       <picker mode="selector" range="{{types}}" value="{{typeIndex}}" bindchange="onTypeChange">
-        <view class="picker-value">{{types[typeIndex]}} ▼</view>
+        <view class="picker-wrapper">
+          <text class="picker-text">{{types[typeIndex]}}</text>
+          <view class="icon-arrow"></view>
+        </view>
       </picker>
     </view>
+
     <view class="form-item">
-      <view class="label">买入日期</view>
+      <view class="label">操作类型</view>
+      <view class="capsule-box" wx:if="{{types[typeIndex] !== '银行存款'}}">
+        <view class="capsule-item {{action==='buy' ? 'active buy' : ''}}" bindtap="onActionChange" data-val="buy">
+          买入 / 申购
+        </view>
+        <view class="capsule-item {{action==='sell' ? 'active sell' : ''}}" bindtap="onActionChange" data-val="sell">
+          卖出 / 赎回
+        </view>
+      </view>
+      <view class="static-tag" wx:else>
+        <view class="dot"></view>
+        <text>存入 / 开户 (默认)</text>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="label">交易日期</view>
       <picker mode="date" value="{{buyDate}}" end="{{maxDate}}" bindchange="onDateChange">
-        <view class="picker-value">{{buyDate}} ▼</view>
+        <view class="picker-wrapper">
+          <text class="picker-text">{{buyDate}}</text>
+          <view class="icon-calendar"></view>
+        </view>
       </picker>
+    </view>
+
+    <view class="form-item">
+      <view class="label">交易渠道</view>
+      <picker mode="selector" range="{{channels}}" value="{{channelIndex}}" bindchange="onChannelChange">
+        <view class="picker-wrapper">
+          <text class="picker-text">{{channels[channelIndex]}}</text>
+          <view class="icon-arrow"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item" wx:if="{{channels[channelIndex] === '其他 / 自定义'}}">
+      <view class="label">自定义渠道</view>
+      <input class="input-styled" placeholder="请输入渠道名称" placeholder-class="placeholder-style" value="{{customChannel}}" bindinput="onCustomChannelInput" />
     </view>
   </view>
 
   <block wx:if="{{types[typeIndex] === '银行存款'}}">
     <view class="card">
-      <view class="title">存款信息</view>
+      <view class="title">存款详情</view>
       <view class="form-item">
         <view class="label">储蓄银行</view>
-        <input placeholder="如：招商银行" value="{{bankName}}" bindinput="onBankNameInput" />
+        <input class="input-styled" placeholder="如：招商银行" placeholder-class="placeholder-style" value="{{bankName}}" bindinput="onBankNameInput" />
       </view>
       <view class="form-item">
-        <view class="label">买入金额</view>
-        <input type="digit" placeholder="0.00" value="{{amount}}" bindinput="onAmountInput" />
+        <view class="label">存入金额</view>
+        <input class="input-styled" type="digit" placeholder="0.00" placeholder-class="placeholder-style" value="{{amount}}" bindinput="onAmountInput" />
       </view>
       <view class="form-item">
         <view class="label">存款期限</view>
-        <input placeholder="如：3年定期" value="{{depositTerm}}" bindinput="onTermInput" />
+        <input class="input-styled" placeholder="如：3年" placeholder-class="placeholder-style" value="{{depositTerm}}" bindinput="onTermInput" />
       </view>
       <view class="form-item">
         <view class="label">年化利率%</view>
-        <input type="digit" placeholder="如：2.85" value="{{annualRate}}" bindinput="onRateInput" />
+        <input class="input-styled" type="digit" placeholder="如：2.85" placeholder-class="placeholder-style" value="{{annualRate}}" bindinput="onRateInput" />
+      </view>
+      <view class="form-item">
+        <view class="label">备注</view>
+        <input class="input-styled" placeholder="可选：备注信息" placeholder-class="placeholder-style" value="{{remark}}" bindinput="onRemarkInput" />
       </view>
     </view>
   </block>
 
   <block wx:else>
     <view class="card">
-      <view class="title">资产信息 (自动获取)</view>
+      <view class="title">
+        {{action==='buy' ? '买入详情' : '卖出详情'}}
+        <text class="sub-title" wx:if="{{isAutoFilling}}">(查询中...)</text>
+      </view>
       
       <view class="form-item">
         <view class="label">产品代码</view>
-        <input type="number" 
-               placeholder="输入代码自动查询" 
-               value="{{code}}" 
-               bindinput="onCodeInput"
-               bindblur="onCodeBlur" 
-               disabled="{{isEditMode}}" />
-        <view class="status" wx:if="{{isAutoFilling}}">查询中...</view>
+        <view class="code-box">
+          <input class="input-styled code-input" type="number" placeholder="输入代码" placeholder-class="placeholder-style" value="{{code}}" bindinput="onCodeInput" bindblur="onCodeBlur" disabled="{{isEditMode}}" />
+          <picker wx:if="{{pickerRange.length > 0}}" mode="selector" range="{{pickerRange}}" bindchange="onQuickSelect">
+             <view class="select-btn">选持仓</view>
+          </picker>
+        </view>
       </view>
 
       <view class="form-item">
         <view class="label">产品名称</view>
-        <input value="{{name}}" disabled="true" placeholder="自动填充" />
+        <input class="input-styled disabled" value="{{name}}" disabled="true" placeholder="自动填充" placeholder-class="placeholder-style" />
       </view>
 
       <view class="form-item">
-        <view class="label">当前净值</view>
-        <input type="digit" value="{{nav}}" bindinput="onNavInput" placeholder="自动填充" />
+        <view class="label">{{action==='buy'?'确认净值':'赎回净值'}}</view>
+        <input class="input-styled" type="digit" value="{{nav}}" bindinput="onNavInput" placeholder="自动填充" placeholder-class="placeholder-style" />
       </view>
 
       <view class="form-item">
-        <view class="label">买入金额</view>
-        <input type="digit" placeholder="0.00" value="{{amount}}" bindinput="onAmountInput" />
+        <view class="label">{{action==='buy'?'买入金额':'赎回金额'}}</view>
+        <input class="input-styled" type="digit" placeholder="0.00" placeholder-class="placeholder-style" value="{{amount}}" bindinput="onAmountInput" />
+      </view>
+
+      <view class="form-item">
+        <view class="label-row">
+          <text class="label">手续费 (元)</text>
+          <text class="auto-tip" wx:if="{{feeTip}}">{{feeTip}}</text>
+        </view>
+        
+        <view class="rate-tags">
+           <view wx:for="{{rateOptions}}" wx:key="*this" 
+                 class="rate-tag {{feeRate === item ? 'selected' : ''}}" 
+                 bindtap="onRateSelect" data-rate="{{item}}">
+             {{item}}%
+           </view>
+        </view>
+
+        <input class="input-styled" type="digit" placeholder="自动计算" placeholder-class="placeholder-style" value="{{fee}}" bindinput="onFeeInput" />
+      </view>
+
+      <view class="form-item">
+        <view class="label">备注</view>
+        <input class="input-styled" placeholder="可选：记录理由" placeholder-class="placeholder-style" value="{{remark}}" bindinput="onRemarkInput" />
       </view>
 
       <view class="result-box" wx:if="{{shares}}">
-        <text>预估确认份额：</text>
+        <text>{{action==='buy'?'预估增加份额':'预估减少份额'}}：</text>
         <text class="highlight">{{shares}} 份</text>
       </view>
     </view>
   </block>
 
-  <button class="save-btn" bindtap="saveAsset">确认记一笔</button>
+  <button class="save-btn {{action==='sell' ? 'btn-sell' : ''}}" bindtap="saveAsset">
+    {{action==='buy' ? '确认存入' : '确认卖出'}}
+  </button>
 </view>

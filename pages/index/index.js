@@ -1,139 +1,200 @@
 // pages/index/index.js
-const db = wx.cloud.database()
+import * as echarts from '../../ec-canvas/echarts';
+
+const app = getApp();
+const db = wx.cloud.database();
+
+let chartInstance = null;
 
 Page({
   data: {
-    totalBalance: "0.00",
-    totalProfit: 0,
-    rankingList: [],
-    isRefreshing: false
-  },
-
-  onShow() { this.loadData(); },
-  onLoad() { this.loadData(); },
-
-  // 1. 加载数据：改为从云端读取
-  loadData() {
-    // 只有在非刷新状态下才显示loading，避免下拉刷新时loading重叠
-    if (!this.data.isRefreshing) {
-       // wx.showLoading({ title: '同步数据...' }); // 可选，看体验
+    totalAsset: '0.00',    // 总资产
+    totalDayProfit: '0.00',// 昨日总收益
+    assetList: [],         // 列表数据
+    ec: {
+      lazyLoad: true       // 延迟加载，必须为 true
     }
+  },
 
+  onShow() {
+    // 1. 防崩溃检查
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().init();
+    }
+    
+    // 2. 刷新数据
+    this.loadAssets();       
+  },
+
+  // 加载数据库资产
+  loadAssets() {
+    wx.showLoading({ title: '刷新资产...' });
+    
     db.collection('assets').get().then(res => {
-      wx.hideLoading();
-      const assetList = res.data;
-
-      if (assetList.length === 0) {
-        this.setData({ totalBalance: "0.00", totalProfit: 0, rankingList: [] });
-        return;
-      }
-
-      let total = 0;
-      let profit = 0;
-
-      assetList.forEach(item => {
-        const bal = parseFloat(item.balance) || 0;
-        const prin = parseFloat(item.principal) || 0;
-        total += bal;
-        profit += (bal - prin);
-      });
-
-      const sortedList = assetList.sort((a, b) => parseFloat(b.balance) - parseFloat(a.balance));
-
-      this.setData({
-        totalBalance: total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}),
-        totalProfit: profit.toFixed(2),
-        rankingList: sortedList
-      });
-    });
-  },
-
-  // 2. 下拉刷新：逻辑大升级
-  onPullDownRefresh() {
-    this.refreshNav();
-  },
-
-  refreshNav() {
-    this.setData({ isRefreshing: true });
-    wx.showLoading({ title: '正在算账...' });
-
-    // 第一步：先从云数据库拿最新列表
-    db.collection('assets').get().then(async res => {
-      const list = res.data;
-      const fundAssets = list.filter(item => item.type === '公募基金' && item.code);
+      const assets = res.data;
       
-      if (fundAssets.length === 0) {
-        wx.showToast({ title: '无基金可更新', icon: 'none' });
-        wx.stopPullDownRefresh();
-        this.setData({ isRefreshing: false });
-        return;
-      }
+      // 提取需要查行情的代码 (排除银行存款)
+      const codes = assets
+        .filter(item => item.type !== '银行存款' && item.code)
+        .map(item => item.code);
 
-      const codes = fundAssets.map(item => item.code);
-
-      // 第二步：调用云函数查净值
-      const cloudRes = await wx.cloud.callFunction({
-        name: 'getFundData',
-        data: { codes: codes }
-      });
-      
-      const cloudData = cloudRes.result.data || [];
-      const updateTasks = []; // 存放所有的更新任务
-
-      // 第三步：遍历对比，如果有变化，就生成一个更新任务
-      list.forEach(item => {
-        const remoteItem = cloudData.find(c => c.code === item.code);
-        if (remoteItem && !remoteItem.error) {
-          const newNav = parseFloat(remoteItem.nav);
-          const rate = parseFloat(remoteItem.rate);
-          const newBalance = (parseFloat(item.shares) * newNav).toFixed(2);
-          
-          // 计算当日收益
-          const currentBalanceVal = parseFloat(newBalance);
-          const yesterdayBalance = currentBalanceVal / (1 + rate / 100);
-          const dayIncomeVal = currentBalanceVal - yesterdayBalance;
-
-          // 【核心】生成更新数据库的 Promise
-          // 只有当净值变了，或者之前没存这些字段时才更新
-          const task = db.collection('assets').doc(item._id).update({
-            data: {
-              nav: newNav,
-              balance: newBalance,
-              rate: rate,
-              dayIncome: dayIncomeVal.toFixed(2),
-              lastUpdate: remoteItem.date
-            }
-          });
-          updateTasks.push(task);
-        }
-      });
-
-      // 第四步：等待所有更新写回数据库
-      if (updateTasks.length > 0) {
-        await Promise.all(updateTasks); // 等所有都存好
-        wx.showToast({ title: '收益已更新', icon: 'success' });
-        this.loadData(); // 重新拉取展示
+      // 获取实时行情
+      if (codes.length > 0) {
+        this.fetchRealTimeData(assets, codes);
       } else {
-        wx.showToast({ title: '暂无新数据', icon: 'none' });
+        this.processData(assets, {}); 
       }
-
     }).catch(err => {
       console.error(err);
-      wx.showToast({ title: '更新失败', icon: 'none' });
-    }).finally(() => {
       wx.hideLoading();
-      wx.stopPullDownRefresh();
-      this.setData({ isRefreshing: false });
     });
   },
 
-  goToDetail(e) {
-    const item = e.currentTarget.dataset.item;
-    const itemStr = encodeURIComponent(JSON.stringify(item));
-    wx.navigateTo({ url: `/pages/detail/detail?assetStr=${itemStr}` });
+  // 获取云端行情
+  fetchRealTimeData(assets, codes) {
+    wx.cloud.callFunction({
+      name: 'getFundData',
+      data: { codes: codes }
+    }).then(res => {
+      const marketData = {};
+      if (res.result && res.result.data) {
+        res.result.data.forEach(item => {
+          marketData[item.code] = {
+            rate: parseFloat(item.gszzl || 0), 
+            nav: parseFloat(item.gsz || item.dwjz || 0)
+          };
+        });
+      }
+      this.processData(assets, marketData);
+    }).catch(err => {
+      console.error('行情失败', err);
+      this.processData(assets, {});
+    });
   },
-  
-  goToAdd() {
-    wx.switchTab({ url: '/pages/add/add' });
+
+  // 核心计算逻辑
+  processData(assets, marketData) {
+    let total = 0;
+    let dayProfitTotal = 0;
+    
+    // 饼图数据统计
+    let typeMap = { '银行存款': 0, '公募基金': 0, '股票/ETF': 0, '定期理财': 0, '其他': 0 };
+
+    const processedList = assets.map(item => {
+      let dailyProfit = 0;  
+      let displayRate = 0;  
+      let currentBalance = parseFloat(item.balance);
+
+      // A. 存款计算
+      if (item.type === '银行存款') {
+        const rate = parseFloat(item.annualRate || 0);
+        displayRate = rate; 
+        // 日息 = 本金 * 年利率% / 365
+        dailyProfit = parseFloat(item.principal) * (rate / 100) / 365;
+        currentBalance = parseFloat(item.principal); 
+      } 
+      // B. 基金/股票计算
+      else {
+        const market = marketData[item.code];
+        if (market) {
+          displayRate = market.rate; 
+          // 昨日盈亏 = 金额 * 涨跌幅%
+          dailyProfit = currentBalance * (market.rate / 100);
+        } else {
+          displayRate = 0;
+        }
+      }
+
+      total += currentBalance;
+      dayProfitTotal += dailyProfit;
+
+      // 累加分类
+      if (typeMap[item.type] !== undefined) {
+        typeMap[item.type] += currentBalance;
+      } else {
+        typeMap['其他'] += currentBalance;
+      }
+
+      return {
+        ...item,
+        currentBalance: currentBalance.toFixed(2),
+        displayRate: displayRate.toFixed(2),
+        dailyProfit: dailyProfit.toFixed(2),
+        isPositive: dailyProfit >= 0
+      };
+    });
+
+    // 按余额降序
+    processedList.sort((a, b) => b.currentBalance - a.currentBalance);
+
+    this.setData({
+      assetList: processedList,
+      totalAsset: total.toFixed(2),
+      totalDayProfit: (dayProfitTotal > 0 ? '+' : '') + dayProfitTotal.toFixed(2)
+    });
+
+    wx.hideLoading();
+
+    // ✨✨✨ 修复图表不显示的问题：加一点点延时，确保 DOM 准备好 ✨✨✨
+    setTimeout(() => {
+      this.initChart(typeMap);
+    }, 200);
+  },
+
+  // 初始化/更新图表
+  initChart(typeMap) {
+    const chartData = Object.keys(typeMap)
+      .filter(key => typeMap[key] > 0)
+      .map(key => ({
+        name: key,
+        value: typeMap[key].toFixed(2)
+      }));
+    
+    if (chartData.length === 0) return;
+
+    const option = {
+      // 经典的金融配色
+      color: ['#1A73E8', '#F0B90B', '#34A853', '#EA4335', '#909399'],
+      tooltip: { 
+        trigger: 'item',
+        formatter: '{b}: {c} ({d}%)' // 显示百分比
+      },
+      legend: { 
+        orient: 'vertical',
+        right: '5%',
+        top: 'center',
+        itemWidth: 10, 
+        itemHeight: 10 
+      },
+      series: [{
+        name: '资产分布',
+        type: 'pie',
+        radius: ['45%', '70%'], // 环形大小
+        center: ['35%', '50%'], // 把饼图稍微往左移，给图例留空间
+        avoidLabelOverlap: false,
+        label: { show: false, position: 'center' },
+        emphasis: {
+          label: { show: true, fontSize: '14', fontWeight: 'bold' }
+        },
+        data: chartData
+      }]
+    };
+
+    const ecComponent = this.selectComponent('#mychart-dom-pie');
+    
+    if (!ecComponent) {
+      console.warn('找不到图表组件');
+      return;
+    }
+
+    if (!chartInstance) {
+      ecComponent.init((canvas, width, height, dpr) => {
+        chartInstance = echarts.init(canvas, null, { width, height, devicePixelRatio: dpr });
+        chartInstance.setOption(option);
+        return chartInstance;
+      });
+    } else {
+      chartInstance.setOption(option);
+    }
   }
-})
+});
