@@ -1,60 +1,252 @@
 /* pages/detail/detail.wxss */
 .container {
   padding: 30rpx;
-  
-  /* ✨ 核心修复：把这个数值改大 */
-  /* 之前可能设小了，改成 250rpx，保证能露出最后一行字 */
-  padding-bottom: 250rpx; 
+  background-color: #f6f7f9;
+  min-height: 100vh;
+  /* 给底部按钮留出空间 */
+  padding-bottom: 200rpx; 
 }
 
-/* 顶部卡片 */
+/* ======================== */
+/* 1. 顶部资产卡片 (通用) */
+/* ======================== */
 .header-card {
-  background: linear-gradient(135deg, #1A73E8, #0D47A1);
-  color: #fff;
+  background: linear-gradient(135deg, #1A73E8, #4285F4); /* 默认蓝色背景 */
   border-radius: 24rpx;
   padding: 40rpx;
-  margin-bottom: 30rpx;
+  color: #fff;
   box-shadow: 0 10rpx 20rpx rgba(26, 115, 232, 0.3);
+  margin-bottom: 30rpx;
+  position: relative;
+  overflow: hidden;
 }
-.name { font-size: 36rpx; font-weight: bold; margin-bottom: 30rpx; }
-.code { font-size: 26rpx; opacity: 0.8; font-weight: normal; }
 
-.balance-row { text-align: center; margin-bottom: 40rpx; }
-.balance-row .label { font-size: 26rpx; opacity: 0.8; margin-bottom: 10rpx; }
-.balance-row .amount { font-size: 64rpx; font-weight: bold; }
-
-.profit-row { display: flex; justify-content: space-between; border-top: 1rpx solid rgba(255,255,255,0.2); padding-top: 20rpx; }
-.profit-row .item { display: flex; flex-direction: column; align-items: center; width: 33%; }
-.p-label { font-size: 24rpx; opacity: 0.7; margin-bottom: 8rpx; }
-.p-value { font-size: 30rpx; font-weight: 500; }
-
-/* 涨跌颜色 (在深色背景下) */
-.p-value.red { color: #FFCDD2; }
-.p-value.green { color: #C8E6C9; }
-
-/* 通用卡片 */
-.card { background: #fff; border-radius: 20rpx; padding: 30rpx; margin-bottom: 30rpx; }
-.card-title { font-size: 32rpx; font-weight: bold; margin-bottom: 20rpx; border-left: 8rpx solid #1A73E8; padding-left: 20rpx; }
-
-/* 走势图 */
-.fund-chart { 
-  width: 100%; 
-  height: 400rpx; /* 给一个固定高度 */
-  display: block; 
-  margin: 20rpx 0; 
+/* 银行存款专用背景 (金色) */
+.header-card.bank-bg {
+  background: linear-gradient(135deg, #F0B90B, #F7931A);
+  box-shadow: 0 10rpx 20rpx rgba(247, 147, 26, 0.3);
 }
-.chart-tip { text-align: center; font-size: 22rpx; color: #999; }
-.no-chart-tip { text-align: center; color: #ccc; padding: 50rpx 0; }
 
-/* 详情行 */
-.row { display: flex; justify-content: space-between; padding: 24rpx 0; border-bottom: 1rpx solid #f5f5f5; font-size: 30rpx; color: #333; }
-.row:last-child { border-bottom: none; }
+.name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
 
-/* 普通红绿文字 */
-.red { color: #E74C3C; font-weight: bold; }
-.green { color: #2ECC71; font-weight: bold; }
+.name {
+  font-size: 36rpx;
+  font-weight: bold;
+  max-width: 70%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-/* 底部悬浮按钮栏 */
+.code, .tag {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6rpx 16rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  font-family: monospace; /* 代码用等宽字体看起来更专业 */
+}
+
+.balance-row {
+  margin-bottom: 30rpx;
+}
+
+.label {
+  font-size: 24rpx;
+  opacity: 0.9;
+  margin-bottom: 10rpx;
+}
+
+.amount {
+  font-size: 60rpx;
+  font-weight: bold;
+}
+
+.profit-row {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.1); /* 稍微深一点的背景条 */
+  border-radius: 12rpx;
+  padding: 20rpx;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+}
+
+.p-label {
+  font-size: 22rpx;
+  opacity: 0.8;
+  margin-bottom: 6rpx;
+}
+
+.p-value {
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+/* 涨跌幅颜色 (在深色背景上，红色稍微亮一点，绿色也亮一点) */
+.red { color: #FFCDD2; }
+.green { color: #C8E6C9; }
+
+
+/* ======================== */
+/* 2. 通用卡片容器 */
+/* ======================== */
+.card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 10rpx rgba(0,0,0,0.02);
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 24rpx;
+  border-left: 8rpx solid #1A73E8;
+  padding-left: 20rpx;
+}
+
+/* ======================== */
+/* 3. 图表卡片样式 */
+/* ======================== */
+.chart-header {
+  display: flex;
+  margin-bottom: 20rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.tab-item {
+  padding: 10rpx 30rpx;
+  font-size: 28rpx;
+  color: #999;
+  position: relative;
+}
+
+.tab-item.active {
+  color: #1A73E8;
+  font-weight: bold;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2rpx;
+  left: 20%;
+  width: 60%;
+  height: 4rpx;
+  background: #1A73E8;
+  border-radius: 4rpx;
+}
+
+.chart-container {
+  width: 100%;
+  height: 400rpx; /* ✨ 必须给高度，否则图表不显示！ */
+  position: relative;
+}
+
+/* 自定义 ec-canvas 标签的宽高 */
+ec-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chart-tip {
+  text-align: right;
+  font-size: 22rpx;
+  color: #ccc;
+  margin-top: 10rpx;
+}
+
+
+/* ======================== */
+/* 4. 持仓成本分析卡片 */
+/* ======================== */
+.cost-comparison {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 30rpx 0;
+  border-bottom: 1rpx dashed #f0f0f0;
+}
+
+.cost-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.c-val {
+  font-size: 44rpx;
+  font-weight: bold;
+  margin-bottom: 8rpx;
+  color: #333;
+}
+
+.c-val.red { color: #E04F4F; }
+.c-val.green { color: #2BA245; }
+
+.c-lbl {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.vs-icon {
+  font-size: 36rpx;
+  color: #E0E0E0;
+  font-weight: bold;
+  font-style: italic;
+  font-family: serif;
+}
+
+.cost-tip {
+  padding-top: 24rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #666;
+  background: #fafafa;
+  margin-top: 20rpx;
+  padding: 16rpx;
+  border-radius: 12rpx;
+}
+
+
+/* ======================== */
+/* 5. 详细信息行样式 */
+/* ======================== */
+.info-card .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f9f9f9;
+  font-size: 28rpx;
+}
+
+.info-card .row:last-child {
+  border-bottom: none;
+}
+
+.info-card text:first-child {
+  color: #888;
+}
+
+.info-card text:last-child {
+  color: #333;
+  font-weight: 500;
+}
+
+/* ======================== */
+/* 6. 底部按钮样式 */
+/* ======================== */
 .footer-action {
   position: fixed;
   bottom: 0;
@@ -64,8 +256,9 @@
   padding: 20rpx 30rpx;
   box-sizing: border-box;
   box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.05);
-  padding-bottom: constant(safe-area-inset-bottom); /* 适配全面屏 */
+  padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
+  z-index: 99;
 }
 
 .add-btn {
@@ -74,4 +267,5 @@
   border-radius: 50rpx;
   font-weight: bold;
   font-size: 32rpx;
+  box-shadow: 0 8rpx 16rpx rgba(26, 115, 232, 0.3);
 }

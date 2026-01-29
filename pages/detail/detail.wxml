@@ -1,68 +1,116 @@
 <view class="container">
-  <view class="header-card">
-    <view class="name">{{asset.name}} <text class="code">({{asset.code}})</text></view>
-    <view class="balance-row">
-      <view class="label">持有金额</view>
-      <view class="amount">¥ {{asset.balance}}</view>
-    </view>
-    <view class="profit-row">
-      <view class="item">
-        <text class="p-label">持有份额</text>
-        <text class="p-value">{{asset.shares}}</text>
-      </view>
-      <view class="item">
-        <text class="p-label">最新净值</text>
-        <text class="p-value">{{asset.nav}}</text>
-      </view>
-      <view class="item">
-        <text class="p-label">日涨跌幅</text>
-        <text class="p-value {{asset.rate >= 0 ? 'red' : 'green'}}">{{asset.rate}}%</text>
-      </view>
-    </view>
+
+<view class="header-card {{asset.type === '银行存款' ? 'bank-bg' : ''}}">
+  <view class="name-row">
+    <view class="name">{{asset.name}}</view>
+    <view class="code" wx:if="{{asset.type !== '银行存款'}}">{{asset.code}}</view>
+    <view class="tag" wx:else>银行存款</view>
   </view>
 
+  <view class="balance-row">
+    <view class="label">当前持有金额 (元)</view>
+    <view class="amount">¥ {{asset.balance}}</view>
+  </view>
+
+  <view class="profit-row" wx:if="{{asset.type !== '银行存款'}}">
+    <view class="item">
+      <text class="p-label">最新净值 ({{asset.date || '--'}})</text>
+      <text class="p-value">{{asset.nav}}</text>
+    </view>
+    <view class="item">
+      <text class="p-label">日涨跌幅</text>
+      <text class="p-value {{asset.rate >= 0 ? 'red' : 'green'}}">{{asset.rate}}%</text>
+    </view>
+  </view>
+</view>
+
+
+<block wx:if="{{asset.type === '银行存款'}}">
+  <view class="card info-card">
+    <view class="card-title">存款信息</view>
+    <view class="row">
+      <text>本金</text>
+      <text>¥ {{asset.principal}}</text>
+    </view>
+    <view class="row">
+      <text>存款期限</text>
+      <text>{{asset.depositTerm}}</text>
+    </view>
+    <view class="row">
+      <text>年化利率</text>
+      <text class="red">{{asset.annualRate}}%</text>
+    </view>
+    <view class="row">
+      <text>买入日期</text>
+      <text>{{asset.buyDate}}</text>
+    </view>
+  </view>
+</block>
+
+
+<block wx:else>
+  
   <view class="card chart-card">
-    <view class="card-title">近一月净值走势</view>
-    
-    <image 
-      wx:if="{{asset.code}}"
-      class="fund-chart" 
-      src="https://image.sinajs.cn/newchart/v5/fund/nav/ss/{{asset.code}}.gif" 
-      mode="aspectFit"
-      binderror="onImageError"
-    ></image>
-    
-    <view wx:else class="no-chart-tip">非基金资产无走势图</view>
-    
-    <view class="chart-tip">数据来源：新浪财经</view>
+    <view class="chart-header">
+      <view class="tab-item {{currentRange==='1m'?'active':''}}" bindtap="switchRange" data-range="1m">近1月</view>
+      <view class="tab-item {{currentRange==='1y'?'active':''}}" bindtap="switchRange" data-range="1y">近1年</view>
+      <view class="tab-item {{currentRange==='all'?'active':''}}" bindtap="switchRange" data-range="all">成立以来</view>
+    </view>
+    <view class="chart-container">
+      <ec-canvas id="mychart-dom-line" canvas-id="mychart-line" ec="{{ ec }}"></ec-canvas>
+    </view>
+    <view class="chart-tip">数据来源：天天基金网</view>
+  </view>
+
+  <view class="card cost-card">
+    <view class="card-title">持仓成本分析</view>
+    <view class="cost-comparison">
+      <view class="cost-item">
+        <text class="c-val">{{costPrice}}</text>
+        <text class="c-lbl">持仓成本价</text>
+      </view>
+      <view class="vs-icon">VS</view>
+      <view class="cost-item">
+        <text class="c-val {{asset.nav >= costPrice ? 'red' : 'green'}}">{{asset.nav}}</text>
+        <text class="c-lbl">当前最新价</text>
+      </view>
+    </view>
+    <view class="cost-tip">
+      <text wx:if="{{asset.nav > costPrice}}">🎉 买入后已上涨，做得好！</text>
+      <text wx:elif="{{asset.nav < costPrice}}">📉 当前低于成本价，可考虑补仓拉低成本。</text>
+      <text wx:else>⚖️ 刚刚回本。</text>
+    </view>
   </view>
 
   <view class="card info-card">
     <view class="card-title">收益详情</view>
+    <view class="row">
+      <text>持有份额</text>
+      <text>{{asset.shares}} 份</text>
+    </view>
     <view class="row">
       <text>投入本金</text>
       <text>¥ {{asset.principal}}</text>
     </view>
     <view class="row">
       <text>累计盈亏</text>
-      <text class="{{(asset.balance - asset.principal) >= 0 ? 'red' : 'green'}}">
-        {{(asset.balance - asset.principal) >= 0 ? '+' : ''}}{{fixedProfit}}
-      </text>
-    </view>
-    <view class="row">
-      <text>当日预估收益</text>
-      <text class="{{asset.dayIncome >= 0 ? 'red' : 'green'}}">
-        {{asset.dayIncome >= 0 ? '+' : ''}}{{asset.dayIncome}}
+      <text class="{{fixedProfit >= 0 ? 'red' : 'green'}}">
+        {{fixedProfit >= 0 ? '+' : ''}}{{fixedProfit}}
       </text>
     </view>
     <view class="row">
       <text>累计收益率</text>
-      <text>{{totalRate}}%</text>
+      <text class="{{totalRate >= 0 ? 'red' : 'green'}}">{{totalRate}}%</text>
+    </view>
+    <view class="row">
+      <text>买入/建仓日期</text>
+      <text>{{asset.buyDate}}</text>
     </view>
   </view>
 
-  <view class="footer-action">
-    <button class="add-btn" bindtap="goAddPosition">➕ 加仓 / 记一笔</button>
-  </view>
-</view> 
+</block>
 
+<view class="footer-action">
+  <button class="add-btn" bindtap="goAddPosition">➕ 加仓 / 记一笔</button>
+</view>
+</view>

@@ -1,68 +1,78 @@
 <view class="container">
-  <view class="form-group">
-    
+  
+  <view class="card">
     <view class="form-item">
-      <view class="label">资产分类</view>
+      <view class="label">产品类型</view>
       <picker mode="selector" range="{{types}}" value="{{typeIndex}}" bindchange="onTypeChange">
-        <view class="picker-inner">
-          <text>{{types[typeIndex]}}</text>
-          <text class="arrow">▼</text>
-        </view>
+        <view class="picker-value">{{types[typeIndex]}} ▼</view>
       </picker>
     </view>
-
     <view class="form-item">
-      <view class="label">资产名称</view>
-      <input 
-        placeholder="例如：招商白酒" 
-        value="{{name}}" 
-        bindinput="onNameInput" 
-        disabled="{{isEditMode}}" 
-      />
+      <view class="label">买入日期</view>
+      <picker mode="date" value="{{buyDate}}" end="{{maxDate}}" bindchange="onDateChange">
+        <view class="picker-value">{{buyDate}} ▼</view>
+      </picker>
     </view>
-
-    <view class="form-item" wx:if="{{types[typeIndex] === '公募基金'}}">
-      <view class="label">基金代码</view>
-      <input 
-        type="number" 
-        placeholder="例如：161725" 
-        value="{{code}}" 
-        bindinput="onCodeInput"
-        disabled="{{isEditMode}}"
-      />
-    </view>
-
-    <view class="form-item">
-      <view class="label">投入本金</view>
-      <input type="digit" placeholder="0.00" value="{{principal}}" bindinput="onPrincipalInput" />
-    </view>
-
-    <view class="form-item" wx:if="{{types[typeIndex] !== '银行存款'}}">
-      <view class="label">持有份额</view>
-      <input type="digit" placeholder="0.00" value="{{shares}}" bindinput="onShareInput" />
-    </view>
-
-    <view class="form-item" wx:if="{{types[typeIndex] !== '银行存款'}}">
-      <view class="label">当前净值</view>
-      <input type="digit" placeholder="例如：1.2500" value="{{nav}}" bindinput="onNavInput" />
-    </view>
-
-    <view class="form-item" wx:if="{{types[typeIndex] === '银行存款'}}">
-      <view class="label">当前余额</view>
-      <input type="digit" placeholder="0.00" value="{{balance}}" bindinput="onBalanceInput" />
-    </view>
-
-    <view class="form-item" wx:if="{{types[typeIndex] === '银行存款'}}">
-      <view class="label">年化利率%</view>
-      <input type="digit" placeholder="例如：2.5" value="{{annualRate}}" bindinput="onRateInput" />
-    </view>
-
   </view>
 
-  <view class="tips">
-    <view>💡 公募基金：请输入代码，首页可自动更新净值</view>
-    <view>💡 银行存款：不自动更新，需手动维护余额</view>
-  </view>
+  <block wx:if="{{types[typeIndex] === '银行存款'}}">
+    <view class="card">
+      <view class="title">存款信息</view>
+      <view class="form-item">
+        <view class="label">储蓄银行</view>
+        <input placeholder="如：招商银行" value="{{bankName}}" bindinput="onBankNameInput" />
+      </view>
+      <view class="form-item">
+        <view class="label">买入金额</view>
+        <input type="digit" placeholder="0.00" value="{{amount}}" bindinput="onAmountInput" />
+      </view>
+      <view class="form-item">
+        <view class="label">存款期限</view>
+        <input placeholder="如：3年定期" value="{{depositTerm}}" bindinput="onTermInput" />
+      </view>
+      <view class="form-item">
+        <view class="label">年化利率%</view>
+        <input type="digit" placeholder="如：2.85" value="{{annualRate}}" bindinput="onRateInput" />
+      </view>
+    </view>
+  </block>
 
-  <button class="save-btn" bindtap="saveAsset">保存资产</button>
+  <block wx:else>
+    <view class="card">
+      <view class="title">资产信息 (自动获取)</view>
+      
+      <view class="form-item">
+        <view class="label">产品代码</view>
+        <input type="number" 
+               placeholder="输入代码自动查询" 
+               value="{{code}}" 
+               bindinput="onCodeInput"
+               bindblur="onCodeBlur" 
+               disabled="{{isEditMode}}" />
+        <view class="status" wx:if="{{isAutoFilling}}">查询中...</view>
+      </view>
+
+      <view class="form-item">
+        <view class="label">产品名称</view>
+        <input value="{{name}}" disabled="true" placeholder="自动填充" />
+      </view>
+
+      <view class="form-item">
+        <view class="label">当前净值</view>
+        <input type="digit" value="{{nav}}" bindinput="onNavInput" placeholder="自动填充" />
+      </view>
+
+      <view class="form-item">
+        <view class="label">买入金额</view>
+        <input type="digit" placeholder="0.00" value="{{amount}}" bindinput="onAmountInput" />
+      </view>
+
+      <view class="result-box" wx:if="{{shares}}">
+        <text>预估确认份额：</text>
+        <text class="highlight">{{shares}} 份</text>
+      </view>
+    </view>
+  </block>
+
+  <button class="save-btn" bindtap="saveAsset">确认记一笔</button>
 </view>
