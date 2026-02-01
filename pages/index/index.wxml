@@ -1,6 +1,7 @@
 <view class="container">
   
   <view class="header-card">
+    <view class="bg-circle"></view> 
     <view class="total-label">总资产 (元)</view>
     <view class="total-amount">{{totalAsset}}</view>
     <view class="today-profit">
@@ -10,62 +11,113 @@
   </view>
 
   <view class="card chart-card">
-    <view class="card-title">资产分布</view>
+    <view class="card-header-row">
+      <view class="card-title">资产透视</view>
+      <view class="chart-tabs">
+        <view class="c-tab {{chartType==='pie'?'active':''}}" bindtap="switchChart" data-type="pie">分布占比</view>
+        <view class="c-tab {{chartType==='bar'?'active':''}}" bindtap="switchChart" data-type="bar">盈亏贡献</view>
+      </view>
+    </view>
     <view class="chart-container">
-      <ec-canvas id="mychart-dom-pie" canvas-id="mychart-pie" ec="{{ ec }}"></ec-canvas>
+      <ec-canvas 
+        id="mychart-dom-pie" 
+        canvas-id="mychart-pie" 
+        ec="{{ ec }}" 
+        type="2d" 
+        style="width: 100%; height: 420rpx; opacity: {{chartOpacity}}; transition: opacity 0.2s;"
+      ></ec-canvas>
     </view>
   </view>
 
-  <view class="card list-card">
-    <view class="card-title">资产列表 (按余额)</view>
+  <view class="card matrix-card">
+    <view class="card-title" style="margin-bottom: 24rpx;">分类概览</view>
+    <view class="category-grid">
+      <view class="cat-item" bindtap="goAssetsPage" data-type="银行存款">
+        <view class="cat-icon gold-bg">💰</view>
+        <view class="cat-info">
+          <text class="cat-name">银行存款</text>
+          <text class="cat-balance">{{categorySummary['银行存款'].balance || '0.00'}}</text>
+        </view>
+        <view class="cat-trend green">+稳定收益</view>
+      </view>
+      <view class="cat-item" bindtap="goAssetsPage" data-type="公募基金">
+        <view class="cat-icon blue-bg">📈</view>
+        <view class="cat-info">
+          <text class="cat-name">公募基金</text>
+          <text class="cat-balance">{{categorySummary['公募基金'].balance || '0.00'}}</text>
+        </view>
+        <view class="cat-trend {{categorySummary['公募基金'].profit >=0 ? 'red':'green'}}">
+          {{categorySummary['公募基金'].profit >=0 ? '+':''}}{{categorySummary['公募基金'].profit}}
+        </view>
+      </view>
+      <view class="cat-item" bindtap="goAssetsPage" data-type="股票/ETF">
+        <view class="cat-icon red-bg">📊</view>
+        <view class="cat-info">
+          <text class="cat-name">股票/ETF</text>
+          <text class="cat-balance">{{categorySummary['股票/ETF'].balance || '0.00'}}</text>
+        </view>
+         <view class="cat-trend {{categorySummary['股票/ETF'].profit >=0 ? 'red':'green'}}">
+          {{categorySummary['股票/ETF'].profit >=0 ? '+':''}}{{categorySummary['股票/ETF'].profit}}
+        </view>
+      </view>
+      <view class="cat-item" bindtap="goAssetsPage" data-type="定期理财">
+        <view class="cat-icon purple-bg">🛡️</view>
+        <view class="cat-info">
+          <text class="cat-name">定期理财</text>
+          <text class="cat-balance">{{categorySummary['定期理财'].balance || '0.00'}}</text>
+        </view>
+         <view class="cat-trend {{categorySummary['定期理财'].profit >=0 ? 'red':'green'}}">
+          {{categorySummary['定期理财'].profit >=0 ? '+':''}}{{categorySummary['定期理财'].profit}}
+        </view>
+      </view>
+    </view>
+
+    <view class="view-all-bar" bindtap="goAssetsPage" data-type="all">
+      <text>查看全部资产明细</text>
+      <text class="arrow">></text>
+    </view>
+  </view>
+
+  <view class="card top-list-card">
+    <view class="card-header-row" style="margin-bottom: 10rpx;">
+       <view class="card-title">今日表现 Top 5 (按收益率)</view>
+    </view>
     
     <view class="asset-list">
-      <block wx:for="{{assetList}}" wx:key="_id">
-        
+      <block wx:for="{{top5List}}" wx:key="_id">
         <view class="asset-item" bindtap="goDetail" data-item="{{item}}">
-          
-          <view class="rank-num">{{index + 1}}</view>
+          <view class="rank-badge rank-{{index+1}}">{{index + 1}}</view>
 
           <view class="info-box">
             <view class="row-top">
               <text class="asset-name">{{item.name}}</text>
               <text class="tag {{item.type==='银行存款'?'tag-gold':'tag-blue'}}">{{item.type}}</text>
             </view>
-            
             <view class="row-bottom">
-              <view class="data-block">
-                 <text wx:if="{{item.type === '银行存款'}}" class="lbl">年化</text>
-                 <text wx:else class="lbl">日涨</text>
-
-                 <text wx:if="{{item.type === '银行存款'}}" class="val gold">{{item.displayRate}}%</text>
-                 <text wx:else class="val {{item.displayRate >= 0 ? 'red' : 'green'}}">
-                   {{item.displayRate >= 0 ? '+' : ''}}{{item.displayRate}}%
-                 </text>
-              </view>
-
-              <view class="divider"></view>
-
-              <view class="data-block">
-                <text class="lbl">{{item.type==='银行存款' ? '日息' : '昨日'}}</text>
-                <text class="val {{item.isPositive ? 'red' : 'green'}}">
-                  {{item.dailyProfit > 0 ? '+' : ''}}{{item.dailyProfit}}
-                </text>
-              </view>
+               <text class="lbl">持有:</text>
+               <text class="val" style="font-size: 26rpx;">¥{{item.currentBalance}}</text>
             </view>
           </view>
 
-          <view class="amount-box">
-            <view class="balance">¥ {{item.currentBalance}}</view>
-            <view class="arrow">></view>
+          <view class="rate-box">
+            <text wx:if="{{item.type === '银行存款'}}" class="rate-val gold">{{item.displayRate}}%</text>
+            <text wx:else class="rate-val {{item.displayRate >= 0 ? 'red' : 'green'}}">
+              {{item.displayRate >= 0 ? '+' : ''}}{{item.displayRate}}%
+            </text>
+            <text class="rate-lbl">{{item.type === '银行存款'?'年化':'日涨跌'}}</text>
           </view>
-
         </view>
-        <view class="line" wx:if="{{index < assetList.length - 1}}"></view>
+        <view class="line" wx:if="{{index < top5List.length - 1}}"></view>
       </block>
       
-      <view wx:if="{{assetList.length === 0}}" class="empty-tip">
-        暂无资产，快去记一笔吧
+      <view wx:if="{{top5List.length === 0}}" class="empty-tip">
+        暂无数据
       </view>
     </view>
   </view>
+
+  <navigator url="/pages/test/test" class="debug-fab">
+    🧪
+  </navigator>
+
 </view>

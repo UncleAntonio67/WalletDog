@@ -9,7 +9,7 @@ Page({
     fixedProfit: 0,
     totalRate: 0,
     costPrice: 0,
-    ec: { lazyLoad: true }, // 必须延迟
+    ec: { lazyLoad: true }, 
     currentRange: '1m', 
     allHistory: [],
     depositInfo: {}
@@ -18,7 +18,6 @@ Page({
   onLoad(options) {
     if (options.assetStr) {
       try {
-        // ✨✨✨ 修复点：解码 -> 解析JSON ✨✨✨
         const decodedStr = decodeURIComponent(options.assetStr);
         const asset = JSON.parse(decodedStr);
 
@@ -48,11 +47,12 @@ Page({
           costPrice: cost.toFixed(4),
           depositInfo: depositInfo
         }, () => {
-          // 3. 如果是基金，延迟画图 (给DOM渲染时间)
+          // 3. 基金图表逻辑
           if (asset.type !== '银行存款' && asset.code) {
+            // 延时500ms，配合2D模式，确保DOM渲染完毕
             setTimeout(() => {
               this.getHistoryData(asset.code);
-            }, 500); // 延时 500ms
+            }, 500); 
           }
         });
 
@@ -113,7 +113,7 @@ Page({
       result.interest = interest.toFixed(2);
       result.total = total.toFixed(2);
       result.daysLeft = daysLeft > 0 ? daysLeft : 0;
-      result.progress = progress.toFixed(1);
+      result.progress = progress.toFixed(1) + '%';
 
     } catch (e) {
       console.error('存款计算出错', e);
@@ -204,7 +204,8 @@ Page({
     const option = {
       color: ["#1A73E8"],
       grid: { left: '10%', right: '5%', bottom: '10%', top: '10%' },
-      tooltip: { trigger: 'axis' },
+      // ✨ 增加 confine: true 防止提示框超出容器
+      tooltip: { trigger: 'axis', confine: true },
       xAxis: { 
         type: 'category', data: dates, axisLine: { show: false }, axisTick: { show: false },
         axisLabel: {

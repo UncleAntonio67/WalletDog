@@ -1,0 +1,6 @@
+page { background: #f6f6f6; padding: 40rpx; }
+.title { font-size: 40rpx; font-weight: bold; margin-bottom: 20rpx; }
+.desc { font-size: 26rpx; color: #666; margin-bottom: 60rpx; display: flex; flex-direction: column; gap: 10rpx;}
+.btn-group button { margin-bottom: 30rpx; }
+.log-box { margin-top: 50rpx; background: #fff; padding: 20rpx; border-radius: 10rpx; min-height: 200rpx; font-size: 24rpx; color: #333; }
+.log-content { margin-top: 10rpx; color: #1aad19; word-break: break-all; }

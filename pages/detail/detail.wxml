@@ -51,7 +51,7 @@
         <text>{{depositInfo.endDate}}</text>
       </view>
       <view class="bar-bg">
-        <view class="bar-fill" style="width: {{depositInfo.progress}}%"></view>
+        <view class="bar-fill" style="width: {{depositInfo.progress}};"></view>
       </view>
       <view class="tips">
         <text>起息日</text>
@@ -84,7 +84,7 @@
     </view>
     
     <view class="chart-container">
-      <ec-canvas id="mychart-dom-line" canvas-id="mychart-line" ec="{{ ec }}"></ec-canvas>
+      <ec-canvas id="mychart-dom-line" canvas-id="mychart-line" ec="{{ ec }}" type="2d" force-use-old-canvas="false"></ec-canvas>
     </view>
     
     <view class="chart-tip">数据来源：天天基金网</view>

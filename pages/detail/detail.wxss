@@ -7,7 +7,7 @@ page {
 
 .container { padding: 30rpx; }
 
-/* 1. 顶部卡片 (重构版) */
+/* 1. 顶部卡片 */
 .header-card {
   background: linear-gradient(135deg, #1A73E8, #4285F4);
   color: #fff;
@@ -24,7 +24,6 @@ page {
   box-shadow: 0 10rpx 20rpx rgba(240, 185, 11, 0.3);
 }
 
-/* 顶部：名字+代码 */
 .header-top {
   display: flex;
   justify-content: space-between;
@@ -44,16 +43,14 @@ page {
   border-radius: 8rpx;
 }
 
-/* 中间：金额 */
 .header-main { margin-bottom: 40rpx; }
 .header-main .label { font-size: 24rpx; opacity: 0.8; margin-bottom: 10rpx; }
 .header-main .amount { font-size: 60rpx; font-weight: bold; font-family: 'DIN', sans-serif; }
 
-/* 底部：两列数据 */
 .header-bottom {
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.05); /* 轻微底色区分 */
+  background: rgba(0, 0, 0, 0.05); 
   border-radius: 16rpx;
   padding: 20rpx;
 }
@@ -73,17 +70,23 @@ page {
   border-radius: 24rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
+  /* 确保卡片本身有定位上下文 */
+  position: relative; 
+  z-index: 1;
 }
 .card-title {
   font-size: 30rpx; font-weight: bold; color: #333;
   margin-bottom: 24rpx; border-left: 8rpx solid #1A73E8; padding-left: 16rpx;
 }
 
-/* ✨✨✨ 图表容器样式 (关键：必须有固定高度) ✨✨✨ */
+/* ✨✨✨ 修复图表：限制容器，防止溢出 ✨✨✨ */
 .chart-container {
   width: 100%;
-  height: 500rpx; /* 强制高度 */
+  height: 500rpx;
   display: block;
+  position: relative; /* 相对定位 */
+  z-index: 0;         /* 层级放低 */
+  overflow: hidden;   /* 超出部分隐藏 */
 }
 ec-canvas { width: 100%; height: 100%; }
 

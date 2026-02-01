@@ -1,64 +1,134 @@
-/* 顶部统计 */
-.header-bar {
-  padding: 20rpx 30rpx;
-  display: flex;
-  justify-content: space-between;
-  font-size: 24rpx;
-  color: #999;
-  background: #f5f7fa;
+/* pages/list/list.wxss */
+page {
+  background-color: #F5F7FA;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+  padding-bottom: 40rpx;
 }
 
-/* 列表容器 */
-.list-container {
-  padding: 0 20rpx 40rpx;
+.container { display: flex; flex-direction: column; min-height: 100vh;}
+
+/* ✨✨✨ 1. 顶部 Tabs (全白沉浸式) ✨✨✨ */
+.header-tabs-fixed {
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  z-index: 100; 
+  background: #FFFFFF; 
+  /* 只有极淡的分割线，去掉厚重的阴影，消除割裂感 */
+  border-bottom: 1rpx solid rgba(0,0,0,0.03); 
 }
 
-/* 资产卡片 */
-.asset-card {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-  display: flex;
-  justify-content: space-between;
+.header-tabs-scroll {
+  display: flex; 
+  white-space: nowrap; 
+  height: 88rpx; /* 标准高度 */
+  align-items: center; 
+  padding: 0 24rpx; 
+}
+
+/* Tab 基础样式 */
+.h-tab {
+  display: inline-flex;
   align-items: center;
-  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.02);
+  justify-content: center;
+  margin-right: 48rpx; 
+  height: 88rpx;
+  font-size: 28rpx; 
+  color: #999; /* 未选中灰色 */
+  position: relative; 
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-/* 按下效果 */
-.asset-card:active {
-  background-color: #f9f9f9;
+
+/* 选中态：大、粗、黑 */
+.h-tab.active { 
+  color: #333; 
+  font-weight: 800; 
+  font-size: 34rpx; 
+  transform: scale(1.02); 
 }
 
-/* 左侧信息 */
-.card-left { display: flex; flex-direction: column; }
-
-.row-1 { display: flex; align-items: center; margin-bottom: 10rpx; }
-.asset-name { font-size: 30rpx; font-weight: bold; color: #333; margin-right: 16rpx; }
-
-/* 标签样式 */
-.tag { font-size: 20rpx; padding: 4rpx 12rpx; border-radius: 8rpx; }
-.tag.blue { background: #E3F2FD; color: #1976D2; }
-.tag.red { background: #FFEBEE; color: #D32F2F; }
-.tag.orange { background: #FFF3E0; color: #F57C00; }
-
-.row-2 { font-size: 24rpx; color: #999; }
-
-/* 右侧金额 */
-.card-right { text-align: right; }
-.amount { font-size: 32rpx; font-weight: bold; color: #333; }
-.profit { font-size: 24rpx; margin-top: 4rpx; }
-
-/* 盈亏颜色 */
-.text-up { color: #E74C3C; }
-.text-down { color: #2ECC71; }
-
-/* 空状态 */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 200rpx;
-  color: #ccc;
-  font-size: 28rpx;
+/* 选中态的小蓝条 (精心设计的短圆角) */
+.h-tab.active::after {
+  content: ''; 
+  position: absolute; 
+  bottom: 14rpx; 
+  left: 50%; 
+  transform: translateX(-50%);
+  width: 28rpx; 
+  height: 8rpx; 
+  background: linear-gradient(90deg, #1A73E8, #4285F4); 
+  border-radius: 4rpx;
+  box-shadow: 0 4rpx 8rpx rgba(26, 115, 232, 0.3); 
 }
-.empty-icon { width: 100rpx; height: 100rpx; opacity: 0.3; margin-bottom: 20rpx; }
+
+/* 占位高度 */
+.header-placeholder { height: 88rpx; }
+
+/* 2. 排序栏 (胶囊风格) */
+.sort-bar {
+  display: flex; 
+  justify-content: space-between; 
+  padding: 20rpx 30rpx; 
+  background: #F5F7FA; 
+  position: sticky; 
+  top: 88rpx; 
+  z-index: 90;
+}
+
+.sort-item {
+  flex: 1; 
+  text-align: center; 
+  font-size: 24rpx; 
+  color: #666; 
+  background: #fff; 
+  margin: 0 10rpx; 
+  padding: 14rpx 0; 
+  border-radius: 30rpx; 
+  border: 1rpx solid transparent; 
+  transition: all 0.2s; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  box-shadow: 0 2rpx 6rpx rgba(0,0,0,0.02);
+}
+
+.sort-item:first-child { margin-left: 0; }
+.sort-item:last-child { margin-right: 0; }
+.sort-item.active { 
+  color: #1A73E8; 
+  background: #E8F0FE; 
+  border-color: rgba(26, 115, 232, 0.1); 
+  font-weight: 600;
+}
+.arrow { font-size: 20rpx; margin-left: 4rpx; transform: scale(0.8);}
+
+/* 3. 图表区 */
+.chart-section { margin: 20rpx 30rpx; background: #fff; border-radius: 24rpx; padding: 32rpx 24rpx; box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);}
+.chart-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24rpx; padding: 0 10rpx;}
+.section-title { font-size: 30rpx; font-weight: 700; color: #333; border-left: 8rpx solid #1A73E8; padding-left: 16rpx; }
+.chart-sub-tabs { display: flex; background: #F0F2F5; padding: 4rpx; border-radius: 12rpx; }
+.s-tab { padding: 6rpx 20rpx; font-size: 22rpx; color: #666; border-radius: 8rpx; transition: all 0.2s; }
+.s-tab.active { background: #fff; color: #1A73E8; font-weight: 600; box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.05); }
+.chart-container { width: 100%; height: 400rpx !important; position: relative; overflow: hidden; }
+ec-canvas { width: 100%; height: 100%; display: block; }
+
+/* 4. 列表容器 */
+.list-container { padding: 0 30rpx; flex: 1;}
+.asset-item { background: #fff; border-radius: 24rpx; padding: 30rpx; margin-bottom: 24rpx; box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.02); position: relative;}
+.asset-item:active { background-color: #FAFAFA; transform: scale(0.995); transition: transform 0.1s;}
+.row-top { display: flex; align-items: center; margin-bottom: 24rpx; padding-bottom: 20rpx; border-bottom: 1rpx solid #F7F7F7;}
+.asset-name { font-size: 32rpx; font-weight: 600; color: #222; max-width: 450rpx; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tag { font-size: 20rpx; padding: 4rpx 12rpx; border-radius: 8rpx; margin-left: 16rpx; font-weight: 500; letter-spacing: 1rpx;}
+.tag-gold { background: #FFF8E1; color: #F57F17; }
+.tag-blue { background: #E3F2FD; color: #1565C0; }
+.row-bottom { display: flex; justify-content: space-between; align-items: center;}
+.detail-col { display: flex; flex-direction: column; }
+.detail-col.center { align-items: center; }
+.detail-col.right { align-items: flex-end; }
+.val { font-size: 32rpx; font-weight: 700; font-family: 'DIN', sans-serif; color: #333; margin-bottom: 8rpx; }
+.lbl { font-size: 22rpx; color: #999; }
+.red { color: #F5222D; }
+.green { color: #00B578; }
+.gold { color: #FAAD14; }
+.empty-tip { text-align: center; color: #AAA; padding: 100rpx 0; font-size: 28rpx; background: #fff; border-radius: 24rpx; margin-top: 20rpx;}

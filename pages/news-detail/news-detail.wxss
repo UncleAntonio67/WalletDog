@@ -1,0 +1,8 @@
+page { background: #fff; }
+.container { padding: 40rpx; }
+.title { font-size: 44rpx; font-weight: bold; color: #333; line-height: 1.4; margin-bottom: 20rpx; }
+.meta { font-size: 24rpx; color: #999; margin-bottom: 20rpx; display: flex; justify-content: space-between; }
+.tags { display: flex; gap: 10rpx; margin-bottom: 30rpx; }
+.tag { font-size: 22rpx; color: #1A73E8; background: #F0F7FF; padding: 4rpx 12rpx; border-radius: 6rpx; }
+.divider { height: 1rpx; background: #F5F5F5; margin-bottom: 40rpx; }
+.content { font-size: 32rpx; color: #444; line-height: 1.8; text-align: justify; }

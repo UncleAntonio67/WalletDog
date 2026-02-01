@@ -48,6 +48,7 @@
   <view class="list-container">
     <block wx:for="{{displayList}}" wx:key="_id">
       <view class="asset-item" bindtap="goDetail" data-item="{{item}}">
+        
         <view class="row-top">
           <text class="asset-name">{{item.name}}</text>
           <text wx:if="{{currentType==='all'}}" class="tag {{item.type==='银行存款'?'tag-gold':'tag-blue'}}">{{item.type}}</text>
@@ -70,6 +71,7 @@
             <text class="lbl">{{item.type === '银行存款'?'今日利息':'昨日盈亏'}}</text>
           </view>
         </view>
+
       </view>
     </block>
     

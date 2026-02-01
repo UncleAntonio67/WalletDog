@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="title">🧪 测试数据控制台</view>
+  
+  <view class="desc">
+    <text>当前环境：{{envId}}</text>
+    <text>功能：一键清空或重置40+条全品类测试数据。</text>
+  </view>
+
+  <view class="btn-group">
+    <button type="warn" bindtap="handleClear" loading="{{loading}}" disabled="{{loading}}">
+      🗑️ 清空所有数据
+    </button>
+    
+    <button type="primary" bindtap="handleInit" loading="{{loading}}" disabled="{{loading}}">
+      ⚡ 生成全量模拟数据 (40条)
+    </button>
+  </view>
+
+  <view class="log-box">
+    <text>日志：</text>
+    <view class="log-content">{{log}}</view>
+  </view>
+</view>

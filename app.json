@@ -2,14 +2,19 @@
   "pages": [
     "pages/index/index",
     "pages/list/list",
+    "pages/news/news",
     "pages/add/add",
-    "pages/detail/detail"
+    "pages/assets/assets",
+    "pages/detail/detail",
+    "pages/test/test",
+    "pages/news-detail/new-detail",
+    "pages/news-detail/news-detail"
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#1A73E8",
-    "navigationBarTitleText": "我的财富",
-    "navigationBarTextStyle": "white"
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "市场资讯",
+    "navigationBarTextStyle": "black"
   },
   "tabBar": {
     "color": "#999999",
@@ -30,6 +35,12 @@
         "selectedIconPath": "images/list-active.png"
       },
       {
+        "pagePath": "pages/news/news",
+        "text": "资讯",
+        "iconPath": "images/news.png",
+        "selectedIconPath": "images/news-active.png"
+      },
+      {
         "pagePath": "pages/add/add",
         "text": "记一笔",
         "iconPath": "images/add.png",
@@ -37,5 +48,7 @@
       }
     ]
   },
-  "sitemapLocation": "sitemap.json"
+  "usingComponents": {
+    "ec-canvas": "ec-canvas/ec-canvas"
+  }
 }

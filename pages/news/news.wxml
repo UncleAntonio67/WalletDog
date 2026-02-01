@@ -1,0 +1,75 @@
+<view class="container">
+  
+  <view class="ticker-wrap">
+    <view class="status-bar">
+       <text class="market-label">GLOBAL MARKETS</text>
+       <view class="update-tip" wx:if="{{lastUpdateTime}}">Live: {{lastUpdateTime}}</view>
+    </view>
+    <swiper class="ticker-swiper" vertical autoplay circular interval="3000" display-multiple-items="1">
+      <swiper-item wx:for="{{[0,1]}}" wx:key="*this" wx:for-index="pageIdx">
+        <view class="ticker-row">
+          <block wx:for="{{indices}}" wx:key="name" wx:for-index="idx">
+            <block wx:if="{{(idx >= pageIdx*3) && (idx < (pageIdx+1)*3)}}">
+              <view class="idx-item">
+                <text class="idx-name">{{item.name}}</text>
+                <text class="idx-val">{{item.value}}</text>
+                <view class="idx-capsule {{item.rate>=0?'bg-red':'bg-green'}}">
+                  <text class="idx-rate">{{item.rate>=0?'+':''}}{{item.rate}}%</text>
+                </view>
+              </view>
+              <view class="idx-divider" wx:if="{{idx % 3 !== 2}}"></view>
+            </block>
+          </block>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <view class="channel-bar">
+    <scroll-view scroll-x class="channel-scroll" enable-flex>
+      <block wx:for="{{channels}}" wx:key="*this">
+        <view class="c-tab {{currentChannel===item?'active':''}}" 
+              bindtap="switchChannel" 
+              data-channel="{{item}}">
+          {{item}}
+        </view>
+      </block>
+    </scroll-view>
+    <view class="channel-mask"></view>
+  </view>
+
+  <scroll-view scroll-y class="news-scroll" bindscrolltolower="onReachBottom" refresher-enabled="{{true}}" bindrefresherrefresh="onPullDownRefresh" refresher-triggered="{{isRefreshing}}">
+    
+    <view class="news-list">
+      <block wx:for="{{newsList}}" wx:key="_id">
+        <view class="news-item" bindtap="goDetail" data-id="{{item._id}}">
+          
+          <view class="news-info">
+            <view class="news-title">{{item.title}}</view>
+            <view class="news-meta">
+              <text class="meta-source source-highlight">{{item.source}}</text>
+              <text class="meta-time">{{item.displayTime}}</text>
+            </view>
+          </view>
+
+          <view class="news-cover">
+            <image class="cover-img" src="{{item.img}}" mode="aspectFill" lazy-load></image>
+          </view>
+
+        </view>
+      </block>
+
+      <view class="empty-state" wx:if="{{newsList.length === 0 && !loading}}">
+        <image class="empty-img" src="https://img.icons8.com/ios/100/cccccc/news.png" mode="aspectFit"></image>
+        <view class="empty-text">数据库暂无内容</view>
+        <button class="init-btn" bindtap="forceInitData">一键初始化演示数据</button>
+      </view>
+
+      <view class="loading-more" wx:if="{{newsList.length > 0}}">
+        <text wx:if="{{loading}}">加载中...</text>
+        <text wx:else>已加载全部</text>
+      </view>
+
+    </view>
+  </scroll-view>
+</view>
